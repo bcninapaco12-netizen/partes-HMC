@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Partes HMC COSSMIL</title>
+<title>Dashboard Partes HMC COSSMIL</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -12,24 +12,29 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-<!-- Encabezado Militar -->
+<!-- Encabezado de Centro de Mando -->
 <header class="bg-slate-900 text-white shadow-md border-b-4 border-blue-800 p-3">
 <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
 <div class="flex items-center gap-2.5">
-<div class="w-9 h-9 bg-blue-800/80 rounded-lg flex items-center justify-center border border-blue-500 shadow-inner">
-<i class="fa-solid fa-shield-halved text-blue-300 text-lg"></i>
+<div class="w-10 h-10 bg-blue-800/90 rounded-xl flex items-center justify-center border border-blue-500 shadow-inner">
+<i class="fa-solid fa-shield-halved text-blue-300 text-xl"></i>
 </div>
 <div>
-<h1 class="text-sm font-black uppercase tracking-wider">Hospital Militar Central "COSSMIL"</h1>
-<p class="text-[11px] text-slate-300 flex items-center gap-1.5">
+<h1 class="text-sm font-black uppercase tracking-wider flex items-center gap-2">
+Hospital Militar Central "COSSMIL"
+<span class="bg-blue-700 text-blue-200 text-[9px] px-1.5 py-0.5 rounded font-mono font-bold">U.A.P.</span>
+</h1>
+<p class="text-[11px] text-slate-300 flex items-center gap-1.5 mt-0.5">
 <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-U.A.P. - Control Centralizado en Tiempo Real
+<span id="txtEstadoNube" class="font-medium text-emerald-400">Google Firebase: En Línea</span>
+<span class="text-slate-500">•</span>
+<span id="txtUltimaSync" class="text-slate-400 text-[10px]">Sincronizando...</span>
 </p>
 </div>
 </div>
 <div class="flex items-center gap-2">
-<span id="relojVivo" class="text-xs bg-slate-800/90 px-2.5 py-1 rounded font-mono text-emerald-400 border border-slate-700 shadow-inner">FH: --</span>
-<button onclick="restablecerNuevoDia()" class="no-print bg-rose-700 hover:bg-rose-800 text-white px-2.5 py-1 rounded text-xs font-bold shadow transition flex items-center gap-1">
+<span id="relojVivo" class="text-xs bg-slate-800/90 px-2.5 py-1.5 rounded-lg font-mono text-emerald-400 border border-slate-700 shadow-inner">FH: --</span>
+<button onclick="restablecerNuevoDia()" class="no-print bg-rose-700 hover:bg-rose-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
 <i class="fa-solid fa-rotate-right"></i> Nuevo Día
 </button>
 </div>
@@ -38,23 +43,23 @@ U.A.P. - Control Centralizado en Tiempo Real
 
 <!-- Navegación por Módulos -->
 <nav class="max-w-7xl mx-auto px-2 mt-2 no-print">
-<div class="flex border-b border-slate-300 bg-white rounded-t shadow-sm overflow-x-auto text-xs">
-<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 mr-1"></i> 1. Formulario</button>
-<button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-check text-emerald-600 mr-1"></i> 2. Cumplimiento</button>
-<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-chart-pie text-amber-600 mr-1"></i> 3. Parte General U.A.P.</button>
+<div class="flex border-b border-slate-300 bg-white rounded-t-lg shadow-sm overflow-x-auto text-xs">
+<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 mr-1.5"></i> 1. Formulario de Envío</button>
+<button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-list-check text-emerald-600 mr-1.5"></i> 2. Cumplimiento (<span id="tabCountCumplidos">0</span>)</button>
+<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-chart-line text-amber-600 mr-1.5"></i> 3. Tablero General U.A.P.</button>
 </div>
 </nav>
 
-<main class="max-w-7xl mx-auto px-2 pb-10 mt-1">
+<main class="max-w-7xl mx-auto px-2 pb-12 mt-1">
 
-<!-- ================= 1. FORMULARIO ================= -->
-<section id="view-registro" class="bg-white rounded-b shadow p-4">
-<div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white p-3 rounded-lg shadow mb-4 flex flex-wrap justify-between items-center text-xs gap-2 border border-blue-700">
-<span class="font-bold uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-calculator text-amber-400"></i> Balance Automático de Fuerza:</span>
+<!-- ================= 1. FORMULARIO DE ENVÍO ================= -->
+<section id="view-registro" class="bg-white rounded-b-lg shadow p-4">
+<div class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white p-3 rounded-lg shadow mb-4 flex flex-wrap justify-between items-center text-xs gap-2 border border-blue-700">
+<span class="font-bold uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-calculator text-amber-400"></i> Balance en Vivo de Fuerza:</span>
 <div class="font-mono text-xs flex gap-1.5 items-center">
-<span class="bg-blue-800/90 px-2 py-0.5 rounded border border-blue-600">Ef: <b id="resumenFormulaEf" class="text-emerald-300">0</b></span> -
+<span class="bg-blue-800/90 px-2 py-0.5 rounded border border-blue-600">Efectivo: <b id="resumenFormulaEf" class="text-emerald-300">0</b></span> -
 <span class="bg-blue-800/90 px-2 py-0.5 rounded border border-blue-600">No Forman: <b id="resumenFormulaNov" class="text-rose-300">0</b></span> =
-<span class="bg-emerald-800 px-2.5 py-0.5 rounded font-black border border-emerald-500 shadow">FORMAN: <b id="resumenFormulaForman" class="text-white text-sm">0</b></span>
+<span class="bg-emerald-800 px-2.5 py-0.5 rounded font-black border border-emerald-500 shadow text-white">FORMAN: <b id="resumenFormulaForman" class="text-sm">0</b></span>
 </div>
 </div>
 
@@ -62,7 +67,7 @@ U.A.P. - Control Centralizado en Tiempo Real
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 <div>
 <label class="font-bold text-slate-700 block mb-1 uppercase">SERVICIO / UNIDAD *</label>
-<select id="unidadSelect" required onchange="verificarOtro(this.value)" class="w-full border p-1.5 rounded bg-slate-50 outline-none focus:ring-2 focus:ring-blue-600">
+<select id="unidadSelect" required onchange="verificarOtro(this.value)" class="w-full border p-2 rounded-lg bg-slate-50 outline-none focus:ring-2 focus:ring-blue-600">
 <option value="">-- Seleccionar Servicio --</option>
 <option value="Servicio de Imagenología">Servicio de Imagenología</option>
 <option value="Servicio de Nutrición">Servicio de Nutrición</option>
@@ -79,57 +84,75 @@ U.A.P. - Control Centralizado en Tiempo Real
 <option value="Citas Médicas">Citas Médicas</option>
 <option value="__OTRO__">➕ OTRO (Escribir manualmente)</option>
 </select>
-<input type="text" id="unidadManual" placeholder="Escriba su Servicio..." class="hidden mt-2 w-full border border-blue-400 p-1.5 rounded bg-blue-50">
+<input type="text" id="unidadManual" placeholder="Escriba su Sección o Servicio..." class="hidden mt-2 w-full border border-blue-400 p-2 rounded-lg bg-blue-50">
 </div>
 <div>
 <label class="font-bold text-slate-700 block mb-1 uppercase">GRADO Y NOMBRE DEL RESPONSABLE *</label>
-<input type="text" id="responsable" placeholder="Ej: Sof. 2do. DESA. Edwin Quispe Aruquipa" required class="w-full border p-1.5 rounded outline-none focus:ring-2 focus:ring-blue-600">
+<input type="text" id="responsable" placeholder="Ej: Sof. 2do. DESA. Edwin Quispe Aruquipa" required class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-600">
 </div>
 </div>
 
-<!-- DESGLOSE FUERZA -->
+<!-- 1. DESGLOSE FUERZA -->
 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
 <h3 class="font-bold text-slate-700 uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-users text-blue-700"></i> 1. Desglose de Personal (Suma al Efectivo)</h3>
 <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
-<div><label class="text-[10px] block font-semibold text-slate-600">Militar</label><input type="number" id="mil" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded p-1 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-slate-600">Civil Ítem</label><input type="number" id="itm" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded p-1 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-blue-900">P-121</label><input type="number" id="p121" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded p-1 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-blue-900">P-251</label><input type="number" id="p251" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded p-1 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-blue-900">P-252</label><input type="number" id="p252" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded p-1 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-slate-600">Tropa/Seg.</label><input type="number" id="trp" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded p-1 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600">Militar</label><input type="number" id="mil" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600">Civil Ítem</label><input type="number" id="itm" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900">P-121</label><input type="number" id="p121" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900">P-251</label><input type="number" id="p251" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900">P-252</label><input type="number" id="p252" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600">Tropa/Seg.</label><input type="number" id="trp" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
 </div>
 <div class="mt-2.5 pt-2 border-t flex justify-between font-bold text-xs">
 <span>EFECTIVO TOTAL REGISTRADO:</span><span id="txtEfectivoTotal" class="text-blue-800 text-sm font-black">0</span>
 </div>
 </div>
 
-<!-- NOVEDADES (RESTAN) -->
-<div class="bg-amber-50/70 p-3 rounded-lg border border-amber-200">
-<div class="flex justify-between items-center mb-2">
+<!-- 2. NOVEDADES (RESTAN AUTOMÁTICAMENTE) -->
+<div class="bg-amber-50/70 p-3.5 rounded-lg border border-amber-200">
+<div class="flex justify-between items-center mb-2.5">
 <h3 class="font-bold text-amber-900 uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-minus text-rose-600"></i> 2. Novedades (Restan automáticamente de Forman)</h3>
-<span class="text-[10px] bg-white px-2 py-0.5 rounded border border-amber-300 font-bold">No Forman: <b id="txtTotalAusentes" class="text-rose-700">0</b></span>
+<span class="text-[10px] bg-white px-2 py-0.5 rounded-full border border-amber-300 font-bold shadow-xs">Total No Forman: <b id="txtTotalAusentes" class="text-rose-700">0</b></span>
 </div>
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-<div class="bg-emerald-100 p-2 rounded-lg border-2 border-emerald-500 text-center shadow-sm">
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+<div class="bg-emerald-100 p-2 rounded-lg border-2 border-emerald-500 text-center shadow-xs">
 <label class="block font-black text-emerald-950 text-[10px] uppercase">FORMAN / ASISTEN</label>
 <input type="number" id="novAsiste" value="0" readonly class="w-full border rounded p-1 text-center font-black text-emerald-900 bg-white text-sm">
 </div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Baja Médica</label><input type="number" id="novBaja" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Vacación</label><input type="number" id="novVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">P/Cuenta Vacación</label><input type="number" id="novCtaVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Guardia HMC</label><input type="number" id="novGuardia" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">P/Cumpleaños</label><input type="number" id="novCumple" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Comisión / FAB</label><input type="number" id="novComision" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Permiso</label><input type="number" id="novPermiso" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Turno Saliente</label><input type="number" id="novSaliente" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Hospitalizado</label><input type="number" id="novHosp" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Faltando s/ Justif.</label><input type="number" id="novFalta" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Cambio de Destino</label><input type="number" id="novCambio" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Baja Médica</label><input type="number" id="novBaja" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Vacación</label><input type="number" id="novVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">P/Cuenta Vacación</label><input type="number" id="novCtaVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Guardia HMC</label><input type="number" id="novGuardia" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">P/Cumpleaños</label><input type="number" id="novCumple" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Comisión / FAB</label><input type="number" id="novComision" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Permiso Especial</label><input type="number" id="novPermiso" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Turno Saliente</label><input type="number" id="novSaliente" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Hospitalizado</label><input type="number" id="novHosp" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Faltando s/ Justif.</label><input type="number" id="novFalta" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Cambio de Destino</label><input type="number" id="novCambio" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+</div>
+
+<!-- NUEVA OPCIÓN OTROS (MANUAL) -->
+<div class="mt-3 pt-2.5 border-t border-amber-300/80 bg-white p-2.5 rounded-lg border">
+<label class="text-[11px] font-bold text-amber-950 uppercase flex items-center gap-1.5 mb-1.5">
+<i class="fa-solid fa-pen-clip text-amber-700"></i> Otras Novedades (Especificación Manual):
+</label>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+<div class="sm:col-span-1">
+<label class="text-[10px] text-slate-600 block mb-0.5">Cantidad (Resta):</label>
+<input type="number" id="novOtros" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-amber-300 rounded-lg p-1.5 text-center font-bold bg-amber-50 text-slate-800">
+</div>
+<div class="sm:col-span-3">
+<label class="text-[10px] text-slate-600 block mb-0.5">Especifique motivo / concepto (ej. Fallecimiento familiar, Aislamiento, Licencia):</label>
+<input type="text" id="novOtrosDetalle" placeholder="Escriba aquí el detalle de la novedad..." class="w-full border rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50">
+</div>
 </div>
 </div>
 
+</div>
+
 <div>
-<label class="font-bold text-slate-700 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Separado por VACACION, GUARDIA HMC, BAJA MEDICA, etc.):</label>
+<label class="font-bold text-slate-700 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Nombres organizados por novedad):</label>
 <textarea id="demostracion" rows="4" placeholder="Ej:&#10;VACACION&#10;MY. DIM. JUAN CARLOS LOPEZ ZEBALLOS&#10;&#10;GUARDIA HMC&#10;SOF. INCL. ANGELICA PEREZ CHAMBILLA&#10;&#10;BAJA MEDICA&#10;SOF.1RO.DEPSS. OSCAR FERNANDEZ ACHA" class="w-full border p-2.5 rounded-lg outline-none font-mono text-xs focus:ring-2 focus:ring-blue-600"></textarea>
 </div>
 
@@ -140,81 +163,125 @@ U.A.P. - Control Centralizado en Tiempo Real
 </section>
 
 <!-- ================= 2. CUMPLIMIENTO ================= -->
-<section id="view-cumplimiento" class="bg-white rounded-b shadow p-4 hidden">
-<div class="flex justify-between items-center border-b pb-3 mb-3">
+<section id="view-cumplimiento" class="bg-white rounded-b-lg shadow p-4 hidden">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
 <div>
-<h2 class="font-bold text-slate-800 uppercase text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-list-check text-emerald-600"></i> Control de Cumplimiento</h2>
-<p class="text-[10px] text-slate-500">Conectado en vivo con Google Firebase</p>
+<h2 class="font-black text-slate-800 uppercase text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-list-check text-emerald-600"></i> Control de Cumplimiento de Servicios</h2>
+<p class="text-[10px] text-slate-500">Monitoreo en tiempo real de recepción de partes</p>
 </div>
-<button onclick="copiarReporteCumplimiento()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded text-xs font-bold shadow flex items-center gap-1.5">
+<div class="flex gap-2">
+<button onclick="copiarReporteCumplimiento()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
 <i class="fa-brands fa-whatsapp text-sm"></i> Copiar Cumplimiento
 </button>
 </div>
+</div>
+
+<!-- Filtro en cumplimiento -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
 <div class="border border-emerald-300 rounded-lg p-3 bg-emerald-50/40">
 <h3 class="font-bold text-emerald-800 uppercase mb-2 flex items-center justify-between">
 <span><i class="fa-solid fa-circle-check text-emerald-600"></i> Partes Recibidos</span>
-<span id="countCumplieron" class="bg-emerald-600 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
+<span id="countCumplieron" class="bg-emerald-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
 </h3>
 <div id="listaCumplieron" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
 </div>
 <div class="border border-rose-300 rounded-lg p-3 bg-rose-50/40">
 <h3 class="font-bold text-rose-800 uppercase mb-2 flex items-center justify-between">
 <span><i class="fa-solid fa-clock text-rose-600"></i> Pendientes / Omisos</span>
-<span id="countFaltan" class="bg-rose-600 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
+<span id="countFaltan" class="bg-rose-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
 </h3>
 <div id="listaFaltan" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
 </div>
 </div>
 </section>
 
-<!-- ================= 3. PARTE GENERAL (DISEÑO DINÁMICO E INTERACTIVO) ================= -->
-<section id="view-centralizado" class="bg-white rounded-b shadow p-4 hidden">
-<div class="no-print flex flex-wrap justify-between items-center gap-2 border-b pb-3 mb-4">
+<!-- ================= 3. PARTE GENERAL (DASHBOARD INTERACTIVO Y PROFESIONAL) ================= -->
+<section id="view-centralizado" class="bg-white rounded-b-lg shadow p-4 hidden">
+
+<!-- Barra de Acción y Herramientas -->
+<div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b pb-3 mb-4">
 <div>
-<h2 class="font-black text-slate-800 text-xs sm:text-sm uppercase flex items-center gap-1.5">
-<i class="fa-solid fa-chart-line text-blue-700"></i> Tablero General Consolidado (U.A.P.)
+<h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-chart-pie text-blue-700"></i> Tablero General Centralizado (U.A.P.)
 </h2>
-<p class="text-[10px] text-slate-500">Sincronización central del Hospital Militar Central</p>
+<p class="text-[10px] text-slate-500">Resumen ejecutivo y consolidado en vivo de todo el Hospital</p>
 </div>
 <div class="flex flex-wrap gap-2">
-<button onclick="copiarResumenWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow flex items-center gap-1.5">
-<i class="fa-brands fa-whatsapp text-sm"></i> Copiar Formato WhatsApp
+<button onclick="copiarResumenWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-regular fa-copy text-sm"></i> Copiar WhatsApp
 </button>
-<button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white px-3 py-1.5 rounded text-xs font-bold shadow flex items-center gap-1.5">
+<button onclick="compartirWhatsAppDirecto()" class="bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-brands fa-whatsapp text-sm text-emerald-300"></i> Abrir WhatsApp
+</button>
+<button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
 <i class="fa-solid fa-print text-sm"></i> Imprimir / PDF
 </button>
-<button onclick="restablecerNuevoDia()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow flex items-center gap-1.5">
+<button onclick="restablecerNuevoDia()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
 <i class="fa-solid fa-rotate-right text-sm"></i> Nuevo Día
 </button>
 </div>
 </div>
 
-<!-- TARJETAS MÉTRICAS VISUALES (CENTRO DE MANDO) -->
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 no-print">
-<div class="bg-gradient-to-br from-blue-900 to-slate-900 text-white p-3 rounded-lg shadow-sm border border-blue-700">
-<span class="text-[10px] uppercase font-bold text-blue-300">Efectivo Total</span>
-<div id="cardEfTotal" class="text-2xl font-black mt-0.5">0</div>
-<div class="text-[9px] text-slate-400 mt-1">100% de fuerza registrada</div>
+<!-- TARJETAS DASHBOARD INTERACTIVAS (KPIs) -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-3 no-print">
+<div class="bg-gradient-to-br from-slate-900 to-blue-950 text-white p-3 rounded-xl shadow-sm border border-slate-700">
+<span class="text-[10px] uppercase font-bold text-blue-300 flex items-center justify-between">
+<span>Efectivo Total</span><i class="fa-solid fa-users text-blue-400"></i>
+</span>
+<div id="cardEfTotal" class="text-2xl font-black mt-1">0</div>
+<div class="text-[9px] text-slate-300 mt-1 font-mono">100% de fuerza registrada</div>
 </div>
-<div class="bg-gradient-to-br from-emerald-800 to-teal-900 text-white p-3 rounded-lg shadow-sm border border-emerald-600">
-<span class="text-[10px] uppercase font-bold text-emerald-300">Forman / Asisten</span>
-<div id="cardForman" class="text-2xl font-black mt-0.5">0</div>
+
+<div class="bg-gradient-to-br from-emerald-900 to-teal-950 text-white p-3 rounded-xl shadow-sm border border-emerald-700">
+<span class="text-[10px] uppercase font-bold text-emerald-300 flex items-center justify-between">
+<span>Forman / Asisten</span><i class="fa-solid fa-user-check text-emerald-400"></i>
+</span>
+<div id="cardForman" class="text-2xl font-black mt-1">0</div>
 <div id="pctForman" class="text-[9px] text-emerald-300 font-bold mt-1">0% presentes</div>
 </div>
-<div class="bg-gradient-to-br from-rose-800 to-red-950 text-white p-3 rounded-lg shadow-sm border border-rose-600">
-<span class="text-[10px] uppercase font-bold text-rose-300">No Forman (Novedades)</span>
-<div id="cardNoForman" class="text-2xl font-black mt-0.5">0</div>
+
+<div class="bg-gradient-to-br from-rose-950 to-red-900 text-white p-3 rounded-xl shadow-sm border border-rose-700">
+<span class="text-[10px] uppercase font-bold text-rose-300 flex items-center justify-between">
+<span>No Forman</span><i class="fa-solid fa-user-xmark text-rose-400"></i>
+</span>
+<div id="cardNoForman" class="text-2xl font-black mt-1">0</div>
 <div id="pctNoForman" class="text-[9px] text-rose-300 font-bold mt-1">0% ausentes</div>
 </div>
-<div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-3 rounded-lg shadow-sm border border-slate-700">
-<span class="text-[10px] uppercase font-bold text-amber-300">Servicios Conectados</span>
-<div id="cardServicios" class="text-2xl font-black mt-0.5">0</div>
-<div class="text-[9px] text-slate-400 mt-1">Reportes sincronizados hoy</div>
+
+<div class="bg-gradient-to-br from-indigo-950 to-slate-900 text-white p-3 rounded-xl shadow-sm border border-indigo-700">
+<span class="text-[10px] uppercase font-bold text-indigo-300 flex items-center justify-between">
+<span>Servicios</span><i class="fa-solid fa-building-circle-check text-indigo-400"></i>
+</span>
+<div id="cardServicios" class="text-2xl font-black mt-1">0</div>
+<div id="pctServicios" class="text-[9px] text-indigo-300 font-mono mt-1">0 de 13 unidades</div>
 </div>
 </div>
 
-<!-- DOCUMENTO OFICIAL FORMAL (PARA VISTA E IMPRESIÓN) -->
+<!-- BARRA DE PROGRESO GLOBAL DE FUERZA -->
+<div class="bg-slate-50 border border-slate-200 p-2.5 rounded-lg mb-4 no-print flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[10px] font-bold">
+<span class="uppercase text-slate-600 flex items-center gap-1"><i class="fa-solid fa-gauge-high text-blue-700"></i> Nivel de Asistencia Hospitalaria en Formación:</span>
+<span id="txtPorcentajeBarra" class="text-emerald-700 font-black">0%</span>
+</div>
+<div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+<div id="barraProgresoAsistencia" class="bg-emerald-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+</div>
+</div>
+
+<!-- BUSCADOR Y FILTROS INTERACTIVOS -->
+<div class="no-print bg-slate-50 border border-slate-200 p-2.5 rounded-lg mb-4 flex flex-col sm:flex-row gap-2 justify-between items-center">
+<div class="w-full sm:w-1/2 relative">
+<i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+<input type="text" id="filtroTexto" oninput="filtrarDashboard()" placeholder="Buscar servicio, responsable o militar..." class="w-full pl-8 pr-3 py-1.5 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-blue-600">
+</div>
+<div class="flex gap-1.5 w-full sm:w-auto">
+<button onclick="setFiltroEstado('todos')" id="btnFiltroTodos" class="px-2.5 py-1 rounded bg-blue-800 text-white font-bold text-[10px]">Todos</button>
+<button onclick="setFiltroEstado('conNovedad')" id="btnFiltroNovedad" class="px-2.5 py-1 rounded bg-slate-200 text-slate-700 font-bold text-[10px]">Con Novedades</button>
+<button onclick="setFiltroEstado('sinNovedad')" id="btnFiltroSinNovedad" class="px-2.5 py-1 rounded bg-slate-200 text-slate-700 font-bold text-[10px]">100% Presentes</button>
+</div>
+</div>
+
+<!-- ================= DOCUMENTO OFICIAL PARA IMPRESIÓN Y REVISIÓN ================= -->
 <div class="border border-slate-300 p-5 rounded-lg bg-white shadow-sm max-w-5xl mx-auto text-xs">
 
 <div class="text-center border-b pb-3 mb-3">
@@ -256,7 +323,7 @@ U.A.P. - Control Centralizado en Tiempo Real
 </table>
 </div>
 
-<!-- CUADRO ESTADÍSTICO DE NOVEDADES (ALINEADO COMO EN LA IMAGEN) -->
+<!-- CUADRO ESTADÍSTICO DE NOVEDADES -->
 <div class="my-4 bg-slate-50 border rounded-lg p-3">
 <h5 class="font-bold uppercase text-xs mb-2 text-slate-800 flex items-center gap-1.5">
 <i class="fa-solid fa-list-numeric text-amber-700"></i> Cuadro Estadístico de Novedades HMC
@@ -264,23 +331,24 @@ U.A.P. - Control Centralizado en Tiempo Real
 <div id="cuadroNovedades" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs"></div>
 </div>
 
-<!-- DEMOSTRACIÓN NOMINAL AGRUPADA POR NOVEDAD (IDÉNTICO A LA IMAGEN) -->
+<!-- DEMOSTRACIÓN NOMINAL AGRUPADA -->
 <div class="my-4">
 <h5 class="font-black uppercase text-xs mb-2 text-slate-900 border-b pb-1 flex items-center gap-1.5">
 <i class="fa-solid fa-address-book text-blue-800"></i> Demostración Nominal Consolidada
 </h5>
-<div id="contenedorDemostracionAgrupada" class="space-y-3 font-mono text-xs"></div>
+<div id="contenedorDemostracionAgrupada" class="space-y-2.5 font-mono text-xs"></div>
 </div>
 
 <!-- DETALLE SERVICIO POR SERVICIO -->
 <div class="my-4">
-<h5 class="font-black uppercase text-xs mb-2 text-slate-900 border-b pb-1 flex items-center gap-1.5">
-<i class="fa-solid fa-layer-group text-slate-700"></i> Detalle Desglosado por Secciones y Servicios
+<h5 class="font-black uppercase text-xs mb-2 text-slate-900 border-b pb-1 flex items-center justify-between">
+<span class="flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-slate-700"></i> Detalle Desglosado por Secciones</span>
+<span id="txtFiltroActivo" class="text-[10px] text-slate-400 font-normal">Mostrando todos</span>
 </h5>
 <div id="detallePorServicio" class="space-y-2 text-[11px]"></div>
 </div>
 
-<!-- FIRMA DIGITAL OFICIAL (MODIFICADA SEGÚN TU INSTRUCCIÓN) -->
+<!-- FIRMA DIGITAL OFICIAL -->
 <div class="mt-10 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px]">
 <div class="text-slate-500 font-mono">
 HOSPITAL MILITAR CENTRAL "COSSMIL"<br>
@@ -314,6 +382,7 @@ const SERVICIOS_OFICIALES=[
 ];
 
 let partes=[];
+let filtroEstadoActual = 'todos';
 
 async function cargarPartesDeLaNube(){
     try{
@@ -321,11 +390,16 @@ async function cargarPartesDeLaNube(){
         if(res.ok){
             const data = await res.json();
             partes = data ? Object.values(data) : [];
+            const ahora = new Date();
+            document.getElementById('txtUltimaSync').innerText = `Sinc: ${ahora.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+            document.getElementById('txtEstadoNube').innerText = "Google Firebase: En Línea";
+            document.getElementById('txtEstadoNube').className = "font-medium text-emerald-400";
             renderizarCumplimiento();
             renderizarCentralizado();
         }
     }catch(err){
-        console.log("Sincronizando...", err);
+        document.getElementById('txtEstadoNube').innerText = "Reintentando conexión...";
+        document.getElementById('txtEstadoNube').className = "font-medium text-amber-400";
     }
 }
 
@@ -364,7 +438,7 @@ function n(id){const e=document.getElementById(id);if(!e)return 0;const v=parseI
 
 function recalcularTodo(){
 const ef=n('mil')+n('itm')+n('p121')+n('p251')+n('p252')+n('trp');
-const aus=n('novBaja')+n('novVacacion')+n('novCtaVacacion')+n('novGuardia')+n('novCumple')+n('novComision')+n('novPermiso')+n('novSaliente')+n('novHosp')+n('novFalta')+n('novCambio');
+const aus=n('novBaja')+n('novVacacion')+n('novCtaVacacion')+n('novGuardia')+n('novCumple')+n('novComision')+n('novPermiso')+n('novSaliente')+n('novHosp')+n('novFalta')+n('novCambio')+n('novOtros');
 const forman=Math.max(0,ef-aus);
 
 document.getElementById('txtEfectivoTotal').innerText=ef;
@@ -401,6 +475,7 @@ id:Date.now(),fechaMilitar:obtenerFechaMilitar(ahora),horaEnvio:h,unidad:u,respo
 mil:n('mil'),itm:n('itm'),p121:n('p121'),p251:n('p251'),p252:n('p252'),trp:n('trp'),efectivo:totalEf,asisten:n('novAsiste'),
 baja:n('novBaja'),vacacion:n('novVacacion'),ctaVacacion:n('novCtaVacacion'),guardiaHmc:n('novGuardia'),cumpleanos:n('novCumple'),
 comision:n('novComision'),permiso:n('novPermiso'),saliente:n('novSaliente'),hospitalizado:n('novHosp'),falta:n('novFalta'),cambioDestino:n('novCambio'),
+otrosCantidad:n('novOtros'),otrosDetalle:document.getElementById('novOtrosDetalle').value.trim(),
 demostracion:document.getElementById('demostracion').value.trim()
 };
 
@@ -471,6 +546,7 @@ f.appendChild(d);
 });
 document.getElementById('countCumplieron').innerText=ok;
 document.getElementById('countFaltan').innerText=pend;
+document.getElementById('tabCountCumplidos').innerText=`${ok}/${ok+pend}`;
 }
 
 function copiarReporteCumplimiento(){
@@ -487,18 +563,38 @@ omisos.forEach((s,i)=>msg+=`${i+1}. *${s}* 🔴 (PENDIENTE)\n`);
 navigator.clipboard.writeText(msg).then(()=>alert('📋 Reporte de cumplimiento copiado para WhatsApp.'));
 }
 
-// RENDERIZADO VISUAL, MODERNO E INTERACTIVO
+// FILTRADO INTERACTIVO DEL DASHBOARD
+function setFiltroEstado(tipo){
+filtroEstadoActual = tipo;
+['Todos','Novedad','SinNovedad'].forEach(t => {
+const b = document.getElementById(`btnFiltro${t}`);
+b.className = 'px-2.5 py-1 rounded bg-slate-200 text-slate-700 font-bold text-[10px]';
+});
+if(tipo === 'todos') document.getElementById('btnFiltroTodos').className = 'px-2.5 py-1 rounded bg-blue-800 text-white font-bold text-[10px]';
+if(tipo === 'conNovedad') document.getElementById('btnFiltroNovedad').className = 'px-2.5 py-1 rounded bg-rose-700 text-white font-bold text-[10px]';
+if(tipo === 'sinNovedad') document.getElementById('btnFiltroSinNovedad').className = 'px-2.5 py-1 rounded bg-emerald-700 text-white font-bold text-[10px]';
+renderizarCentralizado();
+}
+
+function filtrarDashboard(){
+renderizarCentralizado();
+}
+
+// RENDERIZADO VISUAL DEL DASHBOARD
 function renderizarCentralizado(){
 const fhActual = obtenerFechaMilitar();
 document.getElementById('docFH').innerText=`FH.: ${fhActual} | ${new Date().toLocaleTimeString()}`;
 
 let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
-let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,cambio:0};
+let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,cambio:0,otros:0};
+let listaOtrosMotivos = [];
 
 const cont=document.getElementById('detallePorServicio');
 const contDemostracion=document.getElementById('contenedorDemostracionAgrupada');
 cont.innerHTML='';
 contDemostracion.innerHTML='';
+
+const filtroTexto = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
 
 if(partes.length===0){
 cont.innerHTML='<div class="text-center py-6 text-slate-400 bg-slate-50 border border-dashed rounded-lg">No hay partes registrados en la nube hoy.</div>';
@@ -506,17 +602,44 @@ contDemostracion.innerHTML='<div class="text-slate-400 italic">Sin demostración
 }
 
 let todasDemostraciones = [];
+let partesFiltrados = [];
 
-partes.forEach((p,i)=>{
+partes.forEach(p => {
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
 nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
 nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.per+=(p.permiso||0);nov.sal+=(p.saliente||0);
 nov.hosp+=(p.hospitalizado||0);nov.fal+=(p.falta||0);nov.cambio+=(p.cambioDestino||0);
+nov.otros+=(p.otrosCantidad||0);
+
+if(p.otrosCantidad > 0 && p.otrosDetalle){
+listaOtrosMotivos.push(`${p.unidad}: ${p.otrosDetalle} (${p.otrosCantidad})`);
+}
 
 if(p.demostracion) todasDemostraciones.push({unidad: p.unidad, texto: p.demostracion});
 
 const novSec = p.efectivo - p.asisten;
 
+// Comprobación de filtros
+let cumpleFiltro = true;
+if(filtroEstadoActual === 'conNovedad' && novSec === 0) cumpleFiltro = false;
+if(filtroEstadoActual === 'sinNovedad' && novSec > 0) cumpleFiltro = false;
+if(filtroTexto){
+const match = p.unidad.toLowerCase().includes(filtroTexto) || 
+              p.responsable.toLowerCase().includes(filtroTexto) || 
+              (p.demostracion && p.demostracion.toLowerCase().includes(filtroTexto));
+if(!match) cumpleFiltro = false;
+}
+
+if(cumpleFiltro) partesFiltrados.push(p);
+});
+
+// Renderizar lista filtrada
+if(partesFiltrados.length === 0 && partes.length > 0){
+cont.innerHTML = '<div class="text-center py-4 text-slate-400 bg-slate-50 rounded">No se encontraron servicios con el filtro seleccionado.</div>';
+}
+
+partesFiltrados.forEach((p,i)=>{
+const novSec = p.efectivo - p.asisten;
 const d=document.createElement('div');
 d.className='border border-slate-200 p-2.5 rounded-lg bg-slate-50 hover:bg-white transition shadow-sm';
 d.innerHTML=`<div class="flex justify-between font-bold text-slate-900 border-b border-slate-200 pb-1 mb-1">
@@ -524,6 +647,7 @@ d.innerHTML=`<div class="flex justify-between font-bold text-slate-900 border-b 
 <span>Ef: ${p.efectivo} | Forman: <b class="text-emerald-700">${p.asisten}</b> | No Forman: <b class="${novSec>0?'text-rose-700':'text-slate-500'}">${novSec}</b></span>
 </div>
 <div class="text-slate-600 text-[10px]"><b>Resp:</b> ${p.responsable} (Mil:${p.mil} | Ítem:${p.itm} | P-121:${p.p121} | P-251:${p.p251} | P-252:${p.p252} | Tropa:${p.trp})</div>
+${p.otrosCantidad > 0 ? `<div class="text-amber-800 text-[10px] font-semibold mt-0.5">⚠️ Otros (${p.otrosCantidad}): ${p.otrosDetalle || 'Sin especificar'}</div>` : ''}
 ${p.demostracion?`<div class="bg-white border p-1.5 rounded mt-1 font-mono text-[10px] text-slate-800 whitespace-pre-line">${p.demostracion}</div>`:''}`;
 cont.appendChild(d);
 });
@@ -532,8 +656,8 @@ cont.appendChild(d);
 if(todasDemostraciones.length > 0){
 todasDemostraciones.forEach(item => {
 const block = document.createElement('div');
-block.className = 'bg-slate-50 border-l-4 border-blue-800 p-2.5 rounded shadow-sm';
-block.innerHTML = `<div class="font-bold text-blue-900 text-[11px] uppercase mb-1">${item.unidad}:</div><div class="whitespace-pre-line text-slate-800">${item.texto}</div>`;
+block.className = 'bg-slate-50 border-l-4 border-blue-800 p-2.5 rounded-lg shadow-sm';
+block.innerHTML = `<div class="font-bold text-blue-900 text-[11px] uppercase mb-1">${item.unidad}:</div><div class="whitespace-pre-line text-slate-800 leading-relaxed">${item.texto}</div>`;
 contDemostracion.appendChild(block);
 });
 }
@@ -544,11 +668,18 @@ document.getElementById('cardEfTotal').innerText = tEf;
 document.getElementById('cardForman').innerText = tAsis;
 document.getElementById('cardNoForman').innerText = totalNoForman;
 document.getElementById('cardServicios').innerText = partes.length;
+document.getElementById('pctServicios').innerText = `${partes.length} de ${SERVICIOS_OFICIALES.length} unidades`;
 
 const pctF = tEf > 0 ? Math.round((tAsis / tEf) * 100) : 0;
 const pctNF = tEf > 0 ? Math.round((totalNoForman / tEf) * 100) : 0;
 document.getElementById('pctForman').innerText = `${pctF}% presentes`;
 document.getElementById('pctNoForman').innerText = `${pctNF}% ausentes`;
+
+// Barra de progreso interactiva
+document.getElementById('txtPorcentajeBarra').innerText = `${pctF}%`;
+const barra = document.getElementById('barraProgresoAsistencia');
+barra.style.width = `${pctF}%`;
+barra.className = pctF >= 90 ? 'bg-emerald-600 h-full rounded-full transition-all duration-500' : (pctF >= 75 ? 'bg-amber-500 h-full rounded-full transition-all duration-500' : 'bg-rose-600 h-full rounded-full transition-all duration-500');
 
 // Tabla oficial
 document.getElementById('resTotal').innerText=tEf;
@@ -563,67 +694,115 @@ document.getElementById('resNov').innerText=totalNoForman;
 
 // Cuadro numérico tipo imagen
 document.getElementById('cuadroNovedades').innerHTML=`
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>Baja Médica:</span><b class="text-rose-700">${nov.baja}</b></div>
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>P/Cuenta vacación:</span><b>${nov.cta}</b></div>
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>Guardia HMC:</span><b>${nov.guardia}</b></div>
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>P/Cumpleaños:</span><b>${nov.cumple}</b></div>
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>Comisión FAB:</span><b>${nov.com}</b></div>
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>Hospitalizado:</span><b>${nov.hosp}</b></div>
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>Faltando:</span><b class="text-rose-800">${nov.fal}</b></div>
-<div class="p-1.5 bg-white border rounded shadow-xs flex justify-between"><span>Cambio destino:</span><b>${nov.cambio}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Baja Médica:</span><b class="text-rose-700">${nov.baja}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Vacación:</span><b>${nov.vac}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>P/Cuenta vacación:</span><b>${nov.cta}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Guardia HMC:</span><b>${nov.guardia}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>P/Cumpleaños:</span><b>${nov.cumple}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Comisión FAB:</span><b>${nov.com}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Hospitalizado:</span><b>${nov.hosp}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Faltando:</span><b class="text-rose-800">${nov.fal}</b></div>
+<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Cambio destino:</span><b>${nov.cambio}</b></div>
+<div class="p-1.5 bg-amber-50 border border-amber-300 rounded-lg shadow-xs flex justify-between"><span>Otros (Manual):</span><b class="text-amber-900">${nov.otros}</b></div>
 `;
 }
 
-// FORMATO EXACTO A LA IMAGEN DE WHATSAPP CON FIRMA ACTUALIZADA
-function copiarResumenWhatsApp(){
-if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
-
-let tEf=0,tAsis=0;
-let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,hosp:0,fal:0,cambio:0};
-
-partes.forEach(p=>{
-tEf+=p.efectivo;
-tAsis+=p.asisten;
-nov.baja+=(p.baja||0);
-nov.cta+=(p.ctaVacacion||0);
-nov.guardia+=(p.guardiaHmc||0);
-nov.cumple+=(p.cumpleanos||0);
-nov.com+=(p.comision||0);
-nov.hosp+=(p.hospitalizado||0);
-nov.fal+=(p.falta||0);
-nov.cambio+=(p.cambioDestino||0);
-});
-
-const noForman = tEf - tAsis;
-
-// FORMATO IDÉNTICO A TU CAPTURA DE PANTALLA
-let msg=`*PARTE HMC*\n*FH.:* ${obtenerFechaMilitar()}\n\n`;
-msg+=`Efectivo              ${tEf}\n`;
-msg+=`Baja Médica.          ${nov.baja}\n`;
-msg+=`Comision FAB          ${nov.com}\n`;
-msg+=`P/Cuenta vacación.    ${nov.cta}\n`;
-msg+=`P/Cumpleaños.         ${nov.cumple}\n`;
-msg+=`Guardia HMC.          ${nov.guardia}\n`;
-msg+=`Hospitalizado         ${nov.hosp}\n`;
-msg+=`Faltando.             ${nov.fal}\n`;
-msg+=`Cambio de destino.    ${nov.cambio}\n`;
-msg+=`Fallecimiento.        0\n`;
-msg+=`No Forman.            ${noForman}\n`;
-msg+=`Forman.               ${tAsis}\n`;
-msg+=`Total                 ${tEf}\n\n`;
-
-msg+=`*DEMOSTRACIÓN*\n\n`;
+// CONSTRUCTOR DEL REPORTE PROFESIONAL PARA WHATSAPP
+function construirMensajeWhatsApp(){
+let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
+let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,cambio:0,otros:0};
+let otrosDetalles = [];
 
 partes.forEach(p=>{
-if(p.demostracion){
-msg+=`*${p.unidad.toUpperCase()}*\n${p.demostracion}\n\n`;
+tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
+nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
+nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.per+=(p.permiso||0);nov.sal+=(p.saliente||0);
+nov.hosp+=(p.hospitalizado||0);nov.fal+=(p.falta||0);nov.cambio+=(p.cambioDestino||0);
+nov.otros+=(p.otrosCantidad||0);
+
+if(p.otrosCantidad > 0 && p.otrosDetalle){
+otrosDetalles.push(`• ${p.unidad}: ${p.otrosDetalle} (${p.otrosCantidad})`);
 }
 });
 
-// FIRMA EXACTA SOLICITADA
-msg+=`*ATTE.*\nJEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL`;
+const noForman = tEf - tAsis;
+const pctPres = tEf > 0 ? Math.round((tAsis / tEf) * 100) : 0;
 
-navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Parte Consolidado copiado con el formato exacto de la imagen!'));
+let msg = `╔════════════════════════════════════╗\n`;
+msg += `  🏥 *HOSPITAL MILITAR CENTRAL "COSSMIL"*\n`;
+msg += `     *PARTE GENERAL CONSOLIDADO - U.A.P.*\n`;
+msg += `╚════════════════════════════════════╝\n`;
+msg += `*FH.:* ${obtenerFechaMilitar()}\n\n`;
+
+msg += `*1. FUERZA EFECTIVA GENERAL:* ${tEf}\n`;
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+msg += `• Militar:              ${tMil}\n`;
+msg += `• Civil Ítem:           ${tItm}\n`;
+msg += `• Contrato P-121:       ${tP121}\n`;
+msg += `• Contrato P-251:       ${tP251}\n`;
+msg += `• Contrato P-252:       ${tP252}\n`;
+msg += `• Tropa / Seg.:         ${tTrp}\n`;
+msg += `────────────────────────────────────\n`;
+msg += `🟢 *FORMAN / ASISTEN:*   *${tAsis}* (${pctPres}%)\n`;
+msg += `🔴 *NO FORMAN:*          *${noForman}*\n`;
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+msg += `*2. CUADRO NUMÉRICO DE NOVEDADES*\n`;
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+msg += `• Baja Médica:          ${nov.baja}\n`;
+msg += `• Vacación:             ${nov.vac}\n`;
+msg += `• P/Cuenta vacación:    ${nov.cta}\n`;
+msg += `• Guardia HMC:          ${nov.guardia}\n`;
+msg += `• P/Cumpleaños:         ${nov.cumple}\n`;
+msg += `• Comisión FAB:         ${nov.com}\n`;
+msg += `• Permiso Especial:     ${nov.per}\n`;
+msg += `• Turno Saliente:       ${nov.sal}\n`;
+msg += `• Hospitalizado:        ${nov.hosp}\n`;
+msg += `• Faltando:             ${nov.fal}\n`;
+msg += `• Cambio de destino:    ${nov.cambio}\n`;
+if(nov.otros > 0){
+msg += `• Otras Novedades:      ${nov.otros}\n`;
+}
+msg += `────────────────────────────────────\n`;
+msg += `*TOTAL NOVEDADES:*      *${noForman}*\n`;
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+if(otrosDetalles.length > 0){
+msg += `*DETALLE DE OTRAS NOVEDADES:*\n`;
+otrosDetalles.forEach(d => msg += `${d}\n`);
+msg += `\n`;
+}
+
+msg += `*3. DEMOSTRACIÓN NOMINAL*\n`;
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+let hayDem = false;
+partes.forEach(p=>{
+if(p.demostracion){
+hayDem = true;
+msg += `*${p.unidad.toUpperCase()}*\n${p.demostracion}\n\n`;
+}
+});
+if(!hayDem) msg += `_Sin personal con novedad nominal registrada._\n\n`;
+
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+msg += `*ATTE.*\n`;
+msg += `*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\n`;
+msg += `Hospital Militar Central "COSSMIL"`;
+
+return msg;
+}
+
+function copiarResumenWhatsApp(){
+if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
+const msg = construirMensajeWhatsApp();
+navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Parte General Consolidado copiado con éxito para WhatsApp!'));
+}
+
+function compartirWhatsAppDirecto(){
+if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
+const msg = construirMensajeWhatsApp();
+const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+window.open(url, '_blank');
 }
 </script>
 </body>
