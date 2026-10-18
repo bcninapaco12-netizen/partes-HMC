@@ -16,7 +16,7 @@
 <div class="flex items-center gap-2">
 <i class="fa-solid fa-shield-halved text-blue-400 text-xl"></i>
 <div><h1 class="text-sm font-bold uppercase">Hospital Militar Central "COSSMIL"</h1>
-<p class="text-[11px] text-slate-300">U.A.P. - Control Automatizado de Personal</p></div>
+<p class="text-[11px] text-slate-300">U.A.P. - Control Centralizado en Tiempo Real</p></div>
 </div>
 <div class="flex items-center gap-2">
 <span id="relojVivo" class="text-xs bg-slate-800 px-2 py-1 rounded font-mono text-emerald-400 border border-slate-700">FH: --</span>
@@ -76,7 +76,6 @@
 </div>
 </div>
 
-<!-- DESGLOSE FUERZA -->
 <div class="bg-slate-50 p-3 rounded border">
 <h3 class="font-bold text-slate-700 uppercase mb-2"><i class="fa-solid fa-users text-blue-700"></i> 1. Desglose de Personal (Suma al Efectivo)</h3>
 <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
@@ -92,7 +91,6 @@
 </div>
 </div>
 
-<!-- NOVEDADES -->
 <div class="bg-amber-50/60 p-3 rounded border border-amber-200">
 <div class="flex justify-between items-center mb-2">
 <h3 class="font-bold text-amber-900 uppercase"><i class="fa-solid fa-user-minus text-rose-600"></i> 2. Novedades (Restan automáticamente de Forman)</h3>
@@ -122,8 +120,8 @@
 <textarea id="demostracion" rows="3" placeholder="Ej:&#10;BAJA MÉDICA: TF. Romero Rossy (Esguince tobillo)&#10;A CTA VACACIÓN: Lic. Claudia Quispe" class="w-full border p-2 rounded outline-none"></textarea>
 </div>
 
-<button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2.5 rounded shadow uppercase">
-<i class="fa-solid fa-paper-plane"></i> Enviar Parte Oficial
+<button type="submit" id="btnEnviar" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2.5 rounded shadow uppercase">
+<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Parte Oficial a la Nube
 </button>
 </form>
 </section>
@@ -131,7 +129,7 @@
 <!-- CUMPLIMIENTO -->
 <section id="view-cumplimiento" class="bg-white rounded-b shadow p-4 hidden">
 <div class="flex justify-between items-center border-b pb-3 mb-3">
-<div><h2 class="font-bold text-slate-800 uppercase text-xs sm:text-sm">Control de Cumplimiento</h2><p class="text-[10px] text-slate-500">Monitoreo en tiempo real</p></div>
+<div><h2 class="font-bold text-slate-800 uppercase text-xs sm:text-sm">Control de Cumplimiento</h2><p class="text-[10px] text-slate-500">Conectado en vivo con todos los servicios</p></div>
 <button onclick="copiarReporteCumplimiento()" class="bg-blue-700 hover:bg-blue-800 text-white px-2.5 py-1.5 rounded text-xs font-bold shadow">
 <i class="fa-brands fa-whatsapp"></i> Copiar Cumplimiento
 </button>
@@ -206,7 +204,7 @@
 </div>
 
 <div class="mt-8 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px]">
-<div class="text-slate-500 font-mono">SISTEMA CENTRALIZADO HMC - COSSMIL<br>VALIDACIÓN OFICIAL U.A.P.</div>
+<div class="text-slate-500 font-mono">SISTEMA CENTRALIZADO HMC - COSSMIL<br>SINCRONIZADO EN TIEMPO REAL CON LA U.A.P.</div>
 <div class="text-center border border-dashed border-slate-400 p-2 rounded bg-slate-50">
 <div class="text-emerald-700 font-bold uppercase"><i class="fa-solid fa-certificate"></i> FIRMA DIGITAL VALIDADA</div>
 <div class="font-bold text-slate-800 uppercase mt-0.5">TCNL. DEM. JEFE DE LA U.A.P.</div>
@@ -218,8 +216,32 @@
 </main>
 
 <script>
+// ==============================================================
+// BASE DE DATOS EN LA NUBE CONECTADA:
+// ==============================================================
+const URL_BASE_DATOS = "https://jsonblob.com/api/jsonBlob/01a14f66-7403-7537-bfa2-81bcd6a901f5"; 
+
 const SERVICIOS_OFICIALES=["Servicio de Imagenología","Servicio de Nutrición","Mantenimiento e Infraestructura","Sección Almacenes","Sección Activos Fijos","Sección Lavandería","Servicio de Patología","Vigencia de Derechos","Casa Adulto Mayor","Compañía de Seguridad H.M.C.","Sección Adquisición y Contrataciones","Unidad Administrativa Financiera","Citas Médicas"];
-let partes=JSON.parse(localStorage.getItem('partes_hmc_v7'))||[];
+let partes=[];
+
+async function cargarPartesDeLaNube(){
+    try{
+        const res = await fetch(URL_BASE_DATOS, { headers: { 'Accept': 'application/json' } });
+        if(res.ok){
+            const data = await res.json();
+            if(Array.isArray(data)){
+                partes = data;
+                renderizarCumplimiento();
+                renderizarCentralizado();
+            }
+        }
+    }catch(err){
+        console.log("Sincronizando...", err);
+    }
+}
+
+// Sincronización automática cada 7 segundos entre todos los teléfonos
+setInterval(cargarPartesDeLaNube, 7000);
 
 function obtenerFechaMilitar(d=new Date()){
 const dia=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),m=String(d.getMinutes()).padStart(2,'0');
@@ -271,10 +293,12 @@ i.addEventListener('input',recalcularTodo);
 i.addEventListener('change',recalcularTodo);
 });
 recalcularTodo();
+cargarPartesDeLaNube();
 });
 
-function guardarParte(e){
+async function guardarParte(e){
 e.preventDefault();
+
 const sel=document.getElementById('unidadSelect').value;
 const u=sel==='__OTRO__'?document.getElementById('unidadManual').value.trim():sel;
 if(!u){alert('Seleccione o escriba su servicio.');return}
@@ -291,29 +315,63 @@ saliente:n('novSaliente'),alta:n('novAlta'),rotacion:n('novRotacion'),falta:n('n
 demostracion:document.getElementById('demostracion').value.trim()
 };
 
-const idx=partes.findIndex(p=>p.unidad.toLowerCase()===u.toLowerCase());
-if(idx!==-1){
-if(confirm(`"${u}" ya envió parte a las ${partes[idx].horaEnvio}. ¿Desea reemplazarlo?`)) partes[idx]=nuevo;
-else return;
-} else partes.push(nuevo);
+const btn=document.getElementById('btnEnviar');
+btn.innerText="Subiendo a la nube...";
+btn.disabled=true;
 
-localStorage.setItem('partes_hmc_v7',JSON.stringify(partes));
-alert(`✅ Parte registrado a las ${h}.\nEfectivo: ${totalEf} | Forman: ${nuevo.asisten}`);
-document.getElementById('parteForm').reset();
-document.getElementById('unidadManual').classList.add('hidden');
-recalcularTodo();
-switchTab('centralizado');
+try{
+    // Descargar partes actuales de la nube
+    const res = await fetch(URL_BASE_DATOS, { headers: { 'Accept': 'application/json' } });
+    let listaActual = await res.json();
+    if(!Array.isArray(listaActual)) listaActual = [];
+
+    const idx = listaActual.findIndex(p => p.unidad.toLowerCase() === u.toLowerCase());
+    if(idx !== -1){
+        listaActual[idx] = nuevo;
+    } else {
+        listaActual.push(nuevo);
+    }
+
+    // Subir lista combinada a la nube
+    await fetch(URL_BASE_DATOS, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify(listaActual)
+    });
+
+    partes = listaActual;
+    alert(`✅ ¡Parte de ${u} guardado en la nube! Todos lo verán en tiempo real.`);
+    document.getElementById('parteForm').reset();
+    document.getElementById('unidadManual').classList.add('hidden');
+    recalcularTodo();
+    renderizarCumplimiento();
+    renderizarCentralizado();
+    switchTab('centralizado');
+}catch(err){
+    alert("Error de conexión al sincronizar con la nube. Intente nuevamente.");
+}finally{
+    btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Parte Oficial a la Nube';
+    btn.disabled=false;
+}
 }
 
-function restablecerNuevoDia(){
-if(confirm("⚠️ ¿INICIAR NUEVA JORNADA?\nSe borrarán los partes del día anterior para recibir los nuevos de hoy.")){
-partes=[];
-localStorage.removeItem('partes_hmc_v7');
-renderizarCumplimiento();
-renderizarCentralizado();
-recalcularTodo();
-alert("🔄 Pizarra restablecida a cero para hoy.");
-switchTab('registro');
+async function restablecerNuevoDia(){
+if(confirm("⚠️ ¿INICIAR NUEVA JORNADA EN LA NUBE?\nSe borrarán los partes de todos los teléfonos para iniciar el día en blanco.")){
+try{
+    await fetch(URL_BASE_DATOS, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify([])
+    });
+    partes=[];
+    renderizarCumplimiento();
+    renderizarCentralizado();
+    recalcularTodo();
+    alert("🔄 Pizarra restablecida a cero en todos los teléfonos.");
+    switchTab('registro');
+}catch(err){
+    alert("Error al restablecer en la nube.");
+}
 }
 }
 
@@ -366,7 +424,7 @@ let nov={baja:0,vac:0,cta:0,com:0,per:0,sal:0,alta:0,rot:0,fal:0,hosp:0,otr:0};
 const cont=document.getElementById('detallePorServicio');
 cont.innerHTML='';
 
-if(partes.length===0) cont.innerHTML='<div class="text-center py-4 text-slate-400">No hay partes registrados hoy.</div>';
+if(partes.length===0) cont.innerHTML='<div class="text-center py-4 text-slate-400">No hay partes registrados en la nube hoy.</div>';
 
 partes.forEach((p,i)=>{
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
