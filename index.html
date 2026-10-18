@@ -129,7 +129,7 @@
 <!-- CUMPLIMIENTO -->
 <section id="view-cumplimiento" class="bg-white rounded-b shadow p-4 hidden">
 <div class="flex justify-between items-center border-b pb-3 mb-3">
-<div><h2 class="font-bold text-slate-800 uppercase text-xs sm:text-sm">Control de Cumplimiento</h2><p class="text-[10px] text-slate-500">Conectado en vivo con todos los servicios</p></div>
+<div><h2 class="font-bold text-slate-800 uppercase text-xs sm:text-sm">Control de Cumplimiento</h2><p class="text-[10px] text-slate-500">Conectado en vivo con Google Firebase</p></div>
 <button onclick="copiarReporteCumplimiento()" class="bg-blue-700 hover:bg-blue-800 text-white px-2.5 py-1.5 rounded text-xs font-bold shadow">
 <i class="fa-brands fa-whatsapp"></i> Copiar Cumplimiento
 </button>
@@ -216,36 +216,32 @@
 </main>
 
 <script>
-// BASE DE DATOS EN LA NUBE CON CORS ABIERTO
-const URL_NUBE = "https://api.jsonstorage.net/v1/json/cossmil-hmc-bolivia-2026/partes";
+// BASE DE DATOS FIREBASE DE GOOGLE CONECTADA
+const URL_FIREBASE = "https://partes-hmc-default-rtdb.firebaseio.com/partes_dia";
 
 const SERVICIOS_OFICIALES=["Servicio de Imagenología","Servicio de Nutrición","Mantenimiento e Infraestructura","Sección Almacenes","Sección Activos Fijos","Sección Lavandería","Servicio de Patología","Vigencia de Derechos","Casa Adulto Mayor","Compañía de Seguridad H.M.C.","Sección Adquisición y Contrataciones","Unidad Administrativa Financiera","Citas Médicas"];
 let partes=[];
 
 async function cargarPartesDeLaNube(){
     try{
-        const res = await fetch(URL_NUBE);
+        const res = await fetch(`${URL_FIREBASE}.json`);
         if(res.ok){
             const data = await res.json();
-            if(Array.isArray(data)){
-                partes = data;
-                localStorage.setItem('partes_backup_local', JSON.stringify(partes));
-                renderizarCumplimiento();
-                renderizarCentralizado();
+            if(data){
+                partes = Object.values(data);
+            } else {
+                partes = [];
             }
-        }
-    }catch(err){
-        const backup = localStorage.getItem('partes_backup_local');
-        if(backup && partes.length === 0){
-            partes = JSON.parse(backup);
             renderizarCumplimiento();
             renderizarCentralizado();
         }
+    }catch(err){
+        console.log("Sincronizando...", err);
     }
 }
 
-// Sincronización automática cada 7 segundos entre todos los teléfonos
-setInterval(cargarPartesDeLaNube, 7000);
+// Sincronización automática cada 6 segundos entre todos los celulares
+setInterval(cargarPartesDeLaNube, 6000);
 
 function obtenerFechaMilitar(d=new Date()){
 const dia=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),m=String(d.getMinutes()).padStart(2,'0');
@@ -320,53 +316,27 @@ demostracion:document.getElementById('demostracion').value.trim()
 };
 
 const btn=document.getElementById('btnEnviar');
-btn.innerText="Subiendo a la nube...";
+btn.innerText="Enviando a Google Firebase...";
 btn.disabled=true;
 
 try{
-    // Descargar lista actual
-    let lista = [];
-    try{
-        const res = await fetch(URL_NUBE);
-        if(res.ok){
-            const d = await res.json();
-            if(Array.isArray(d)) lista = d;
-        }
-    }catch(err){
-        lista = partes;
-    }
-
-    const idx = lista.findIndex(p => p.unidad.toLowerCase() === u.toLowerCase());
-    if(idx !== -1){
-        lista[idx] = nuevo;
-    } else {
-        lista.push(nuevo);
-    }
-
-    // Guardar en la nube con PUT
-    await fetch(URL_NUBE, {
+    const clave = encodeURIComponent(u.toLowerCase().replace(/[.#$\[\]]/g, '_'));
+    
+    // Guardar en Firebase de Google
+    await fetch(`${URL_FIREBASE}/${clave}.json`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(lista)
+        body: JSON.stringify(nuevo)
     });
 
-    partes = lista;
-    localStorage.setItem('partes_backup_local', JSON.stringify(partes));
-    alert(`✅ ¡Parte de ${u} guardado y sincronizado con éxito! Todos pueden verlo en tiempo real.`);
+    alert(`✅ ¡Parte de ${u} guardado y sincronizado con éxito!`);
     document.getElementById('parteForm').reset();
     document.getElementById('unidadManual').classList.add('hidden');
     recalcularTodo();
-    renderizarCumplimiento();
-    renderizarCentralizado();
+    await cargarPartesDeLaNube();
     switchTab('centralizado');
 }catch(err){
-    // Si falla el internet, se guarda en el teléfono para no perder los datos
-    partes.push(nuevo);
-    localStorage.setItem('partes_backup_local', JSON.stringify(partes));
-    alert(`⚠️ Guardado localmente.`);
-    renderizarCumplimiento();
-    renderizarCentralizado();
-    switchTab('centralizado');
+    alert("Error de conexión con la nube. Verifique su internet.");
 }finally{
     btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Parte Oficial a la Nube';
     btn.disabled=false;
@@ -376,19 +346,16 @@ try{
 async function restablecerNuevoDia(){
 if(confirm("⚠️ ¿INICIAR NUEVA JORNADA EN LA NUBE?\nSe borrarán los partes de todos los teléfonos para iniciar el día en blanco.")){
 try{
-    await fetch(URL_NUBE, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify([])
-    });
-}catch(e){}
-partes=[];
-localStorage.removeItem('partes_backup_local');
-renderizarCumplimiento();
-renderizarCentralizado();
-recalcularTodo();
-alert("🔄 Pizarra restablecida a cero en todos los teléfonos.");
-switchTab('registro');
+    await fetch(`${URL_FIREBASE}.json`, { method: 'DELETE' });
+    partes=[];
+    renderizarCumplimiento();
+    renderizarCentralizado();
+    recalcularTodo();
+    alert("🔄 Pizarra restablecida a cero en todos los teléfonos.");
+    switchTab('registro');
+}catch(err){
+    alert("Error al restablecer en Firebase.");
+}
 }
 }
 
