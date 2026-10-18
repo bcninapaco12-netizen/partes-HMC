@@ -5,6 +5,8 @@
 <title>Dashboard Partes HMC COSSMIL</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Motor de Generación de Imagen HD -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 .active-tab{border-bottom:3px solid #1e3a8a;color:#1e3a8a;font-weight:700;background:#f8fafc}
 @media print{header,nav,.no-print{display:none!important}#view-centralizado{display:block!important;padding:0!important}}
@@ -12,7 +14,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-<!-- Encabezado de Centro de Mando -->
+<!-- Encabezado Institucional -->
 <header class="bg-slate-900 text-white shadow-md border-b-4 border-blue-800 p-3">
 <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
 <div class="flex items-center gap-2.5">
@@ -41,12 +43,13 @@ Hospital Militar Central "COSSMIL"
 </div>
 </header>
 
-<!-- Navegación por Módulos -->
+<!-- Navegación por 4 Módulos -->
 <nav class="max-w-7xl mx-auto px-2 mt-2 no-print">
 <div class="flex border-b border-slate-300 bg-white rounded-t-lg shadow-sm overflow-x-auto text-xs">
-<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 mr-1.5"></i> 1. Formulario de Envío</button>
+<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 mr-1.5"></i> 1. Formulario</button>
 <button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-list-check text-emerald-600 mr-1.5"></i> 2. Cumplimiento (<span id="tabCountCumplidos">0</span>)</button>
-<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-chart-line text-amber-600 mr-1.5"></i> 3. Tablero General U.A.P.</button>
+<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-file-contract text-amber-600 mr-1.5"></i> 3. Parte General U.A.P.</button>
+<button onclick="switchTab('tablaResumen')" id="tab-tablaResumen" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-table-cells text-indigo-600 mr-1.5"></i> 4. Tabla Resumen Dinámica</button>
 </div>
 </nav>
 
@@ -108,7 +111,7 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- 2. NOVEDADES (RESTAN AUTOMÁTICAMENTE) -->
+<!-- 2. NOVEDADES (RESTAN) -->
 <div class="bg-amber-50/70 p-3.5 rounded-lg border border-amber-200">
 <div class="flex justify-between items-center mb-2.5">
 <h3 class="font-bold text-amber-900 uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-minus text-rose-600"></i> 2. Novedades (Restan automáticamente de Forman)</h3>
@@ -132,7 +135,7 @@ Hospital Militar Central "COSSMIL"
 <div><label class="text-[10px] block text-slate-600 font-medium">Cambio de Destino</label><input type="number" id="novCambio" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
 </div>
 
-<!-- NUEVA OPCIÓN OTROS (MANUAL) -->
+<!-- OTROS (MANUAL) -->
 <div class="mt-3 pt-2.5 border-t border-amber-300/80 bg-white p-2.5 rounded-lg border">
 <label class="text-[11px] font-bold text-amber-950 uppercase flex items-center gap-1.5 mb-1.5">
 <i class="fa-solid fa-pen-clip text-amber-700"></i> Otras Novedades (Especificación Manual):
@@ -143,8 +146,8 @@ Hospital Militar Central "COSSMIL"
 <input type="number" id="novOtros" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-amber-300 rounded-lg p-1.5 text-center font-bold bg-amber-50 text-slate-800">
 </div>
 <div class="sm:col-span-3">
-<label class="text-[10px] text-slate-600 block mb-0.5">Especifique motivo / concepto (ej. Fallecimiento familiar, Aislamiento, Licencia):</label>
-<input type="text" id="novOtrosDetalle" placeholder="Escriba aquí el detalle de la novedad..." class="w-full border rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50">
+<label class="text-[10px] text-slate-600 block mb-0.5">Motivo / Concepto (ej. Fallecimiento, Aislamiento, Licencia):</label>
+<input type="text" id="novOtrosDetalle" placeholder="Escriba el motivo de la ausencia..." class="w-full border rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50">
 </div>
 </div>
 </div>
@@ -152,7 +155,7 @@ Hospital Militar Central "COSSMIL"
 </div>
 
 <div>
-<label class="font-bold text-slate-700 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Nombres organizados por novedad):</label>
+<label class="font-bold text-slate-700 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Organizado por novedad):</label>
 <textarea id="demostracion" rows="4" placeholder="Ej:&#10;VACACION&#10;MY. DIM. JUAN CARLOS LOPEZ ZEBALLOS&#10;&#10;GUARDIA HMC&#10;SOF. INCL. ANGELICA PEREZ CHAMBILLA&#10;&#10;BAJA MEDICA&#10;SOF.1RO.DEPSS. OSCAR FERNANDEZ ACHA" class="w-full border p-2.5 rounded-lg outline-none font-mono text-xs focus:ring-2 focus:ring-blue-600"></textarea>
 </div>
 
@@ -176,7 +179,6 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- Filtro en cumplimiento -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
 <div class="border border-emerald-300 rounded-lg p-3 bg-emerald-50/40">
 <h3 class="font-bold text-emerald-800 uppercase mb-2 flex items-center justify-between">
@@ -195,23 +197,24 @@ Hospital Militar Central "COSSMIL"
 </div>
 </section>
 
-<!-- ================= 3. PARTE GENERAL (DASHBOARD INTERACTIVO Y PROFESIONAL) ================= -->
+<!-- ================= 3. PARTE GENERAL (CON GENERADOR DE IMAGEN HD) ================= -->
 <section id="view-centralizado" class="bg-white rounded-b-lg shadow p-4 hidden">
 
-<!-- Barra de Acción y Herramientas -->
+<!-- Barra de Acción y Botones -->
 <div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b pb-3 mb-4">
 <div>
 <h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
-<i class="fa-solid fa-chart-pie text-blue-700"></i> Tablero General Centralizado (U.A.P.)
+<i class="fa-solid fa-file-contract text-blue-700"></i> Parte General Consolidado (U.A.P.)
 </h2>
-<p class="text-[10px] text-slate-500">Resumen ejecutivo y consolidado en vivo de todo el Hospital</p>
+<p class="text-[10px] text-slate-500">Documento ejecutivo institucional y exportación para WhatsApp</p>
 </div>
 <div class="flex flex-wrap gap-2">
-<button onclick="copiarResumenWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
-<i class="fa-regular fa-copy text-sm"></i> Copiar WhatsApp
+<!-- BOTÓN PRINCIPAL DE IMAGEN HD PARA WHATSAPP -->
+<button onclick="generarImagenWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
+<i class="fa-solid fa-image text-emerald-200"></i> Descargar Imagen WhatsApp
 </button>
-<button onclick="compartirWhatsAppDirecto()" class="bg-emerald-800 hover:bg-emerald-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
-<i class="fa-brands fa-whatsapp text-sm text-emerald-300"></i> Abrir WhatsApp
+<button onclick="copiarResumenWhatsApp()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-regular fa-copy text-slate-300"></i> Copiar Texto
 </button>
 <button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
 <i class="fa-solid fa-print text-sm"></i> Imprimir / PDF
@@ -229,7 +232,7 @@ Hospital Militar Central "COSSMIL"
 <span>Efectivo Total</span><i class="fa-solid fa-users text-blue-400"></i>
 </span>
 <div id="cardEfTotal" class="text-2xl font-black mt-1">0</div>
-<div class="text-[9px] text-slate-300 mt-1 font-mono">100% de fuerza registrada</div>
+<div class="text-[9px] text-slate-300 mt-1 font-mono">100% fuerza registrada</div>
 </div>
 
 <div class="bg-gradient-to-br from-emerald-900 to-teal-950 text-white p-3 rounded-xl shadow-sm border border-emerald-700">
@@ -257,10 +260,10 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- BARRA DE PROGRESO GLOBAL DE FUERZA -->
+<!-- BARRA DE ASISTENCIA GLOBAL -->
 <div class="bg-slate-50 border border-slate-200 p-2.5 rounded-lg mb-4 no-print flex flex-col gap-1.5">
 <div class="flex justify-between items-center text-[10px] font-bold">
-<span class="uppercase text-slate-600 flex items-center gap-1"><i class="fa-solid fa-gauge-high text-blue-700"></i> Nivel de Asistencia Hospitalaria en Formación:</span>
+<span class="uppercase text-slate-600 flex items-center gap-1"><i class="fa-solid fa-gauge-high text-blue-700"></i> Nivel Global de Asistencia del Personal:</span>
 <span id="txtPorcentajeBarra" class="text-emerald-700 font-black">0%</span>
 </div>
 <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
@@ -268,25 +271,21 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- BUSCADOR Y FILTROS INTERACTIVOS -->
-<div class="no-print bg-slate-50 border border-slate-200 p-2.5 rounded-lg mb-4 flex flex-col sm:flex-row gap-2 justify-between items-center">
-<div class="w-full sm:w-1/2 relative">
+<!-- BUSCADOR INTERACTIVO LIMPIO (SIN BOTONES INNECESARIOS) -->
+<div class="no-print bg-slate-50 border border-slate-200 p-2.5 rounded-lg mb-4">
+<div class="relative w-full">
 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-<input type="text" id="filtroTexto" oninput="filtrarDashboard()" placeholder="Buscar servicio, responsable o militar..." class="w-full pl-8 pr-3 py-1.5 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-blue-600">
-</div>
-<div class="flex gap-1.5 w-full sm:w-auto">
-<button onclick="setFiltroEstado('todos')" id="btnFiltroTodos" class="px-2.5 py-1 rounded bg-blue-800 text-white font-bold text-[10px]">Todos</button>
-<button onclick="setFiltroEstado('conNovedad')" id="btnFiltroNovedad" class="px-2.5 py-1 rounded bg-slate-200 text-slate-700 font-bold text-[10px]">Con Novedades</button>
-<button onclick="setFiltroEstado('sinNovedad')" id="btnFiltroSinNovedad" class="px-2.5 py-1 rounded bg-slate-200 text-slate-700 font-bold text-[10px]">100% Presentes</button>
+<input type="text" id="filtroTexto" oninput="filtrarDashboard()" placeholder="Escriba para filtrar servicios, responsables o militares..." class="w-full pl-8 pr-3 py-1.5 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-blue-600">
 </div>
 </div>
 
-<!-- ================= DOCUMENTO OFICIAL PARA IMPRESIÓN Y REVISIÓN ================= -->
-<div class="border border-slate-300 p-5 rounded-lg bg-white shadow-sm max-w-5xl mx-auto text-xs">
+<!-- ================= DOCUMENTO OFICIAL / FLYER PARA FOTO WHATSAPP ================= -->
+<div id="flyerOficialWhatsApp" class="border border-slate-300 p-5 rounded-lg bg-white shadow-sm max-w-5xl mx-auto text-xs">
 
 <div class="text-center border-b pb-3 mb-3">
-<h3 class="text-[10px] tracking-widest font-bold uppercase text-slate-600">Fuerzas Armadas de Bolivia</h3>
-<h2 class="text-sm font-black uppercase text-slate-900">Hospital Militar Central "COSSMIL"</h2>
+<!-- CAMBIO OFICIAL SOLICITADO: MINISTERIO DE DEFENSA -->
+<h3 class="text-[11px] tracking-widest font-black uppercase text-slate-700">Ministerio de Defensa</h3>
+<h2 class="text-sm font-black uppercase text-slate-900 mt-0.5">Hospital Militar Central "COSSMIL"</h2>
 <h4 class="text-[11px] font-bold uppercase text-blue-900 tracking-wider">Unidad de Administración de Personal (U.A.P.)</h4>
 <p class="text-[11px] font-mono mt-1 font-bold text-slate-700" id="docFH">FH.: --</p>
 </div>
@@ -343,7 +342,6 @@ Hospital Militar Central "COSSMIL"
 <div class="my-4">
 <h5 class="font-black uppercase text-xs mb-2 text-slate-900 border-b pb-1 flex items-center justify-between">
 <span class="flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-slate-700"></i> Detalle Desglosado por Secciones</span>
-<span id="txtFiltroActivo" class="text-[10px] text-slate-400 font-normal">Mostrando todos</span>
 </h5>
 <div id="detallePorServicio" class="space-y-2 text-[11px]"></div>
 </div>
@@ -351,8 +349,8 @@ Hospital Militar Central "COSSMIL"
 <!-- FIRMA DIGITAL OFICIAL -->
 <div class="mt-10 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px]">
 <div class="text-slate-500 font-mono">
-HOSPITAL MILITAR CENTRAL "COSSMIL"<br>
-SISTEMA DE FUERZA Y NOVEDADES EN VIVO
+MINISTERIO DE DEFENSA<br>
+HOSPITAL MILITAR CENTRAL "COSSMIL"
 </div>
 <div class="text-center border-2 border-dashed border-slate-400 p-3 rounded-lg bg-slate-50 min-w-[280px]">
 <div class="text-emerald-700 font-bold uppercase text-[9px] mb-1 flex items-center justify-center gap-1">
@@ -368,7 +366,65 @@ JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL
 </div>
 </section>
 
+<!-- ================= 4. TABLA DINÁMICA RESUMEN DE TODAS LAS UNIDADES ================= -->
+<section id="view-tablaResumen" class="bg-white rounded-b-lg shadow p-4 hidden">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
+<div>
+<h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-table-cells text-indigo-700"></i> Matriz Dinámica Resumen de Unidades
+</h2>
+<p class="text-[10px] text-slate-500">Supervisión comparativa e inspección detallada de cómo envió cada servicio</p>
+</div>
+<div class="flex items-center gap-2">
+<select id="filtroRapidoUnidad" onchange="filtrarTablaPorSelect(this.value)" class="border rounded-lg p-1.5 text-xs bg-slate-50 outline-none">
+<option value="">-- Ver todas las unidades --</option>
+</select>
+</div>
+</div>
+
+<!-- TABLA MATRIZ CON ORDENAMIENTO -->
+<div class="overflow-x-auto my-2 border border-slate-200 rounded-lg shadow-xs">
+<table class="w-full border-collapse text-left text-xs">
+<thead>
+<tr class="bg-slate-900 text-white text-[10px] uppercase font-bold select-none cursor-pointer">
+<th onclick="ordenarTabla('unidad')" class="p-2 border-b border-slate-700 hover:bg-slate-800">Unidad / Servicio ⬍</th>
+<th onclick="ordenarTabla('efectivo')" class="p-2 border-b border-slate-700 text-center hover:bg-slate-800">Ef ⬍</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Mil</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Ítem</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-121</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-251</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-252</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Trp</th>
+<th onclick="ordenarTabla('asisten')" class="p-2 border-b border-slate-700 text-center bg-emerald-900 hover:bg-emerald-800">Forman ⬍</th>
+<th onclick="ordenarTabla('noForman')" class="p-2 border-b border-slate-700 text-center bg-rose-950 hover:bg-rose-900">No Forman ⬍</th>
+<th onclick="ordenarTabla('asistenciaPct')" class="p-2 border-b border-slate-700 text-center hover:bg-slate-800">% Asist ⬍</th>
+<th class="p-2 border-b border-slate-700 text-center">Acción</th>
+</tr>
+</thead>
+<tbody id="cuerpoTablaDinamica" class="divide-y divide-slate-200 text-[11px]"></tbody>
+<tfoot id="pieTablaDinamica" class="bg-slate-100 font-black text-[11px] border-t-2 border-slate-400"></tfoot>
+</table>
+</div>
+</section>
+
 </main>
+
+<!-- ================= MODAL DETALLE DE CÓMO ENVIÓ LA UNIDAD ================= -->
+<div id="modalDetalleServicio" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
+<div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-300">
+<div class="bg-slate-900 text-white p-3.5 rounded-t-xl flex justify-between items-center">
+<div>
+<h3 id="modalTituloServicio" class="font-black text-sm uppercase">Detalle del Servicio</h3>
+<p id="modalSubtituloServicio" class="text-[10px] text-slate-300">Comprobante de recepción en la nube</p>
+</div>
+<button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-0.5"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div id="modalCuerpoDetalle" class="p-4 space-y-3 text-xs"></div>
+<div class="bg-slate-50 p-3 rounded-b-xl border-t text-right">
+<button onclick="cerrarModalDetalle()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Cerrar</button>
+</div>
+</div>
+</div>
 
 <script>
 // BASE DE DATOS FIREBASE DE GOOGLE (PROBADA Y OPERATIVA)
@@ -382,7 +438,8 @@ const SERVICIOS_OFICIALES=[
 ];
 
 let partes=[];
-let filtroEstadoActual = 'todos';
+let ordenActualColumna = '';
+let ordenAscendente = true;
 
 async function cargarPartesDeLaNube(){
     try{
@@ -396,6 +453,8 @@ async function cargarPartesDeLaNube(){
             document.getElementById('txtEstadoNube').className = "font-medium text-emerald-400";
             renderizarCumplimiento();
             renderizarCentralizado();
+            renderizarTablaDinamica();
+            actualizarSelectUnidades();
         }
     }catch(err){
         document.getElementById('txtEstadoNube').innerText = "Reintentando conexión...";
@@ -419,13 +478,14 @@ if(r) r.innerText=`FH: ${obtenerFechaMilitar(ahora)} (${ahora.toLocaleTimeString
 },1000);
 
 function switchTab(t){
-['registro','cumplimiento','centralizado'].forEach(v=>{
+['registro','cumplimiento','centralizado','tablaResumen'].forEach(v=>{
 document.getElementById(`view-${v}`).classList.toggle('hidden',v!==t);
 const b=document.getElementById(`tab-${v}`);
 b.className=v===t?'px-4 py-2.5 active-tab whitespace-nowrap':'px-4 py-2.5 text-slate-600 whitespace-nowrap';
 });
 if(t==='cumplimiento') renderizarCumplimiento();
 if(t==='centralizado') renderizarCentralizado();
+if(t==='tablaResumen') renderizarTablaDinamica();
 }
 
 function verificarOtro(v){
@@ -512,6 +572,7 @@ try{
     partes=[];
     renderizarCumplimiento();
     renderizarCentralizado();
+    renderizarTablaDinamica();
     recalcularTodo();
     alert("🔄 Pizarra restablecida a cero en todos los teléfonos.");
     switchTab('registro');
@@ -563,19 +624,6 @@ omisos.forEach((s,i)=>msg+=`${i+1}. *${s}* 🔴 (PENDIENTE)\n`);
 navigator.clipboard.writeText(msg).then(()=>alert('📋 Reporte de cumplimiento copiado para WhatsApp.'));
 }
 
-// FILTRADO INTERACTIVO DEL DASHBOARD
-function setFiltroEstado(tipo){
-filtroEstadoActual = tipo;
-['Todos','Novedad','SinNovedad'].forEach(t => {
-const b = document.getElementById(`btnFiltro${t}`);
-b.className = 'px-2.5 py-1 rounded bg-slate-200 text-slate-700 font-bold text-[10px]';
-});
-if(tipo === 'todos') document.getElementById('btnFiltroTodos').className = 'px-2.5 py-1 rounded bg-blue-800 text-white font-bold text-[10px]';
-if(tipo === 'conNovedad') document.getElementById('btnFiltroNovedad').className = 'px-2.5 py-1 rounded bg-rose-700 text-white font-bold text-[10px]';
-if(tipo === 'sinNovedad') document.getElementById('btnFiltroSinNovedad').className = 'px-2.5 py-1 rounded bg-emerald-700 text-white font-bold text-[10px]';
-renderizarCentralizado();
-}
-
 function filtrarDashboard(){
 renderizarCentralizado();
 }
@@ -587,7 +635,7 @@ document.getElementById('docFH').innerText=`FH.: ${fhActual} | ${new Date().toLo
 
 let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
 let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,cambio:0,otros:0};
-let listaOtrosMotivos = [];
+let otrosDetalles = [];
 
 const cont=document.getElementById('detallePorServicio');
 const contDemostracion=document.getElementById('contenedorDemostracionAgrupada');
@@ -612,31 +660,19 @@ nov.hosp+=(p.hospitalizado||0);nov.fal+=(p.falta||0);nov.cambio+=(p.cambioDestin
 nov.otros+=(p.otrosCantidad||0);
 
 if(p.otrosCantidad > 0 && p.otrosDetalle){
-listaOtrosMotivos.push(`${p.unidad}: ${p.otrosDetalle} (${p.otrosCantidad})`);
+otrosDetalles.push(`${p.unidad}: ${p.otrosDetalle} (${p.otrosCantidad})`);
 }
 
 if(p.demostracion) todasDemostraciones.push({unidad: p.unidad, texto: p.demostracion});
 
-const novSec = p.efectivo - p.asisten;
-
-// Comprobación de filtros
-let cumpleFiltro = true;
-if(filtroEstadoActual === 'conNovedad' && novSec === 0) cumpleFiltro = false;
-if(filtroEstadoActual === 'sinNovedad' && novSec > 0) cumpleFiltro = false;
+let match = true;
 if(filtroTexto){
-const match = p.unidad.toLowerCase().includes(filtroTexto) || 
-              p.responsable.toLowerCase().includes(filtroTexto) || 
-              (p.demostracion && p.demostracion.toLowerCase().includes(filtroTexto));
-if(!match) cumpleFiltro = false;
+match = p.unidad.toLowerCase().includes(filtroTexto) || 
+        p.responsable.toLowerCase().includes(filtroTexto) || 
+        (p.demostracion && p.demostracion.toLowerCase().includes(filtroTexto));
 }
-
-if(cumpleFiltro) partesFiltrados.push(p);
+if(match) partesFiltrados.push(p);
 });
-
-// Renderizar lista filtrada
-if(partesFiltrados.length === 0 && partes.length > 0){
-cont.innerHTML = '<div class="text-center py-4 text-slate-400 bg-slate-50 rounded">No se encontraron servicios con el filtro seleccionado.</div>';
-}
 
 partesFiltrados.forEach((p,i)=>{
 const novSec = p.efectivo - p.asisten;
@@ -652,7 +688,6 @@ ${p.demostracion?`<div class="bg-white border p-1.5 rounded mt-1 font-mono text-
 cont.appendChild(d);
 });
 
-// Renderizar demostración agrupada
 if(todasDemostraciones.length > 0){
 todasDemostraciones.forEach(item => {
 const block = document.createElement('div');
@@ -662,7 +697,6 @@ contDemostracion.appendChild(block);
 });
 }
 
-// Métricas de tarjetas superiores
 const totalNoForman = tEf - tAsis;
 document.getElementById('cardEfTotal').innerText = tEf;
 document.getElementById('cardForman').innerText = tAsis;
@@ -675,13 +709,11 @@ const pctNF = tEf > 0 ? Math.round((totalNoForman / tEf) * 100) : 0;
 document.getElementById('pctForman').innerText = `${pctF}% presentes`;
 document.getElementById('pctNoForman').innerText = `${pctNF}% ausentes`;
 
-// Barra de progreso interactiva
 document.getElementById('txtPorcentajeBarra').innerText = `${pctF}%`;
 const barra = document.getElementById('barraProgresoAsistencia');
 barra.style.width = `${pctF}%`;
 barra.className = pctF >= 90 ? 'bg-emerald-600 h-full rounded-full transition-all duration-500' : (pctF >= 75 ? 'bg-amber-500 h-full rounded-full transition-all duration-500' : 'bg-rose-600 h-full rounded-full transition-all duration-500');
 
-// Tabla oficial
 document.getElementById('resTotal').innerText=tEf;
 document.getElementById('resMil').innerText=tMil;
 document.getElementById('resItm').innerText=tItm;
@@ -692,7 +724,6 @@ document.getElementById('resTrp').innerText=tTrp;
 document.getElementById('resAsis').innerText=tAsis;
 document.getElementById('resNov').innerText=totalNoForman;
 
-// Cuadro numérico tipo imagen
 document.getElementById('cuadroNovedades').innerHTML=`
 <div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Baja Médica:</span><b class="text-rose-700">${nov.baja}</b></div>
 <div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Vacación:</span><b>${nov.vac}</b></div>
@@ -707,11 +738,244 @@ document.getElementById('cuadroNovedades').innerHTML=`
 `;
 }
 
-// CONSTRUCTOR DEL REPORTE PROFESIONAL PARA WHATSAPP
-function construirMensajeWhatsApp(){
+// ================= RENDERIZADO TABLA DINÁMICA (4TA PESTAÑA) =================
+function renderizarTablaDinamica(){
+const tbody = document.getElementById('cuerpoTablaDinamica');
+const tfoot = document.getElementById('pieTablaDinamica');
+tbody.innerHTML = '';
+
+let lista = [...partes];
+
+if(ordenActualColumna){
+lista.sort((a,b)=>{
+let vA = a[ordenActualColumna];
+let vB = b[ordenActualColumna];
+if(ordenActualColumna === 'noForman'){
+vA = (a.efectivo||0) - (a.asisten||0);
+vB = (b.efectivo||0) - (b.asisten||0);
+}
+if(ordenActualColumna === 'asistenciaPct'){
+vA = a.efectivo > 0 ? (a.asisten / a.efectivo) : 0;
+vB = b.efectivo > 0 ? (b.asisten / b.efectivo) : 0;
+}
+if(typeof vA === 'string'){
+return ordenAscendente ? vA.localeCompare(vB) : vB.localeCompare(vA);
+}
+return ordenAscendente ? (vA - vB) : (vB - vA);
+});
+}
+
+let totEf=0,totMil=0,totItm=0,totP121=0,totP251=0,totP252=0,totTrp=0,totAsis=0,totNoF=0;
+
+if(lista.length === 0){
+tbody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-slate-400">No hay partes registrados para mostrar en la matriz.</td></tr>`;
+}
+
+lista.forEach(p => {
+const noF = (p.efectivo||0) - (p.asisten||0);
+const pct = p.efectivo > 0 ? Math.round((p.asisten / p.efectivo) * 100) : 0;
+
+totEf += p.efectivo; totMil += p.mil; totItm += p.itm; totP121 += p.p121;
+totP251 += p.p251; totP252 += p.p252; totTrp += p.trp; totAsis += p.asisten; totNoF += noF;
+
+const tr = document.createElement('tr');
+tr.className = 'hover:bg-slate-50 transition border-b border-slate-200';
+tr.innerHTML = `
+<td class="p-2 font-bold text-slate-800">
+<div>${p.unidad}</div>
+<div class="text-[9px] text-slate-400 font-normal"><i class="fa-regular fa-clock"></i> ${p.horaEnvio} | ${p.responsable}</div>
+</td>
+<td class="p-2 text-center font-bold text-blue-900">${p.efectivo}</td>
+<td class="p-2 text-center text-slate-600">${p.mil}</td>
+<td class="p-2 text-center text-slate-600">${p.itm}</td>
+<td class="p-2 text-center text-blue-800">${p.p121||0}</td>
+<td class="p-2 text-center text-blue-800">${p.p251||0}</td>
+<td class="p-2 text-center text-blue-800">${p.p252||0}</td>
+<td class="p-2 text-center text-slate-600">${p.trp}</td>
+<td class="p-2 text-center font-bold text-emerald-700 bg-emerald-50/50">${p.asisten}</td>
+<td class="p-2 text-center font-bold ${noF>0?'text-rose-700 bg-rose-50/50':'text-slate-400'}">${noF}</td>
+<td class="p-2 text-center">
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${pct>=90?'bg-emerald-100 text-emerald-800':(pct>=75?'bg-amber-100 text-amber-800':'bg-rose-100 text-rose-800')}">${pct}%</span>
+</td>
+<td class="p-2 text-center">
+<button onclick="verDetalleEnvio('${encodeURIComponent(p.unidad)}')" class="bg-blue-800 hover:bg-blue-900 text-white px-2 py-1 rounded text-[10px] font-bold shadow-xs transition">
+<i class="fa-solid fa-receipt"></i> Detalle
+</button>
+</td>
+`;
+tbody.appendChild(tr);
+});
+
+const totPct = totEf > 0 ? Math.round((totAsis / totEf) * 100) : 0;
+tfoot.innerHTML = `
+<tr>
+<td class="p-2 uppercase text-slate-800">TOTAL GENERAL:</td>
+<td class="p-2 text-center text-blue-900">${totEf}</td>
+<td class="p-2 text-center">${totMil}</td>
+<td class="p-2 text-center">${totItm}</td>
+<td class="p-2 text-center">${totP121}</td>
+<td class="p-2 text-center">${totP251}</td>
+<td class="p-2 text-center">${totP252}</td>
+<td class="p-2 text-center">${totTrp}</td>
+<td class="p-2 text-center text-emerald-800">${totAsis}</td>
+<td class="p-2 text-center text-rose-800">${totNoF}</td>
+<td class="p-2 text-center text-blue-900">${totPct}%</td>
+<td class="p-2 text-center text-slate-500 font-normal">--</td>
+</tr>
+`;
+}
+
+function ordenarTabla(col){
+if(ordenActualColumna === col){
+ordenAscendente = !ordenAscendente;
+} else {
+ordenActualColumna = col;
+ordenAscendente = true;
+}
+renderizarTablaDinamica();
+}
+
+function actualizarSelectUnidades(){
+const sel = document.getElementById('filtroRapidoUnidad');
+if(!sel) return;
+const valActual = sel.value;
+sel.innerHTML = `<option value="">-- Ver todas las unidades (${partes.length}) --</option>`;
+partes.forEach(p => {
+sel.innerHTML += `<option value="${p.unidad}">${p.unidad}</option>`;
+});
+sel.value = valActual;
+}
+
+function filtrarTablaPorSelect(unidad){
+if(!unidad){
+renderizarTablaDinamica();
+return;
+}
+verDetalleEnvio(encodeURIComponent(unidad));
+}
+
+// MODAL DETALLE DE CÓMO ENVIÓ SU PARTE
+function verDetalleEnvio(unidadEncoded){
+const unidad = decodeURIComponent(unidadEncoded);
+const p = partes.find(x => x.unidad.toLowerCase() === unidad.toLowerCase());
+if(!p) return;
+
+document.getElementById('modalTituloServicio').innerText = p.unidad;
+document.getElementById('modalSubtituloServicio').innerText = `Enviado a las: ${p.horaEnvio} | FH: ${p.fechaMilitar || 'Registrado'}`;
+
+const noF = (p.efectivo||0) - (p.asisten||0);
+const cuerpo = document.getElementById('modalCuerpoDetalle');
+cuerpo.innerHTML = `
+<div class="bg-slate-50 border p-2.5 rounded-lg">
+<div class="text-[11px] font-bold text-slate-700 uppercase">Responsable Oficial:</div>
+<div class="text-xs font-black text-slate-900">${p.responsable}</div>
+</div>
+
+<div class="border rounded-lg p-2.5 bg-blue-50/50">
+<div class="text-[10px] font-bold uppercase text-blue-900 mb-1">Efectivo Desglosado:</div>
+<div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
+<div class="bg-white p-1 rounded border">Mil: <b>${p.mil}</b></div>
+<div class="bg-white p-1 rounded border">Ítem: <b>${p.itm}</b></div>
+<div class="bg-white p-1 rounded border text-blue-800">P-121: <b>${p.p121||0}</b></div>
+<div class="bg-white p-1 rounded border text-blue-800">P-251: <b>${p.p251||0}</b></div>
+<div class="bg-white p-1 rounded border text-blue-800">P-252: <b>${p.p252||0}</b></div>
+<div class="bg-white p-1 rounded border">Trp: <b>${p.trp}</b></div>
+</div>
+<div class="mt-2 pt-1 border-t flex justify-between font-bold text-xs">
+<span>Total Efectivo: <b class="text-blue-900">${p.efectivo}</b></span>
+<span class="text-emerald-700">Forman: <b>${p.asisten}</b></span>
+<span class="${noF>0?'text-rose-700':'text-slate-500'}">No Forman: <b>${noF}</b></span>
+</div>
+</div>
+
+<div class="border rounded-lg p-2.5 bg-amber-50/40">
+<div class="text-[10px] font-bold uppercase text-amber-900 mb-1">Novedades Numéricas:</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
+<div>Baja: <b>${p.baja||0}</b></div>
+<div>Vacación: <b>${p.vacacion||0}</b></div>
+<div>P/Cta: <b>${p.ctaVacacion||0}</b></div>
+<div>Guardia: <b>${p.guardiaHmc||0}</b></div>
+<div>Cumpleaños: <b>${p.cumpleanos||0}</b></div>
+<div>Comisión: <b>${p.comision||0}</b></div>
+<div>Saliente: <b>${p.saliente||0}</b></div>
+<div>Hospitalizado: <b>${p.hospitalizado||0}</b></div>
+</div>
+${p.otrosCantidad > 0 ? `<div class="mt-1 pt-1 border-t text-[10px] text-amber-900 font-semibold">Otros (${p.otrosCantidad}): ${p.otrosDetalle || 'Sin detalle'}</div>` : ''}
+</div>
+
+<div>
+<div class="text-[10px] font-bold uppercase text-slate-700 mb-1">Demostración Nominal Enviada:</div>
+<div class="bg-slate-900 text-slate-100 p-2.5 rounded-lg font-mono text-[10px] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
+${p.demostracion ? p.demostracion : 'Sin demostración nominal.'}
+</div>
+</div>
+`;
+
+document.getElementById('modalDetalleServicio').classList.remove('hidden');
+}
+
+function cerrarModalDetalle(){
+document.getElementById('modalDetalleServicio').classList.add('hidden');
+}
+
+// ================= GENERADOR DE IMAGEN HD PARA WHATSAPP =================
+async function generarImagenWhatsApp(){
+if(partes.length===0) return alert('No hay partes registrados para generar la imagen.');
+
+const btn = event.currentTarget;
+const textoOriginal = btn.innerHTML;
+btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generando Imagen HD...';
+btn.disabled = true;
+
+try{
+    const flyer = document.getElementById('flyerOficialWhatsApp');
+    
+    // Captura con html2canvas en alta resolución (escala 2)
+    const canvas = await html2canvas(flyer, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+    });
+
+    canvas.toBlob(async (blob) => {
+        const nombreArchivo = `PARTE_HMC_${obtenerFechaMilitar()}.png`;
+        const file = new File([blob], nombreArchivo, { type: 'image/png' });
+
+        // Intentar compartir directo a WhatsApp si el celular lo soporta
+        if(navigator.canShare && navigator.canShare({ files: [file] })){
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: 'PARTE GENERAL HMC',
+                    text: `PARTE GENERAL CONSOLIDADO HMC - U.A.P.`
+                });
+                return;
+            } catch (err) {}
+        }
+
+        // Descarga automática de la imagen para adjuntar en WhatsApp
+        const enlace = document.createElement('a');
+        enlace.download = nombreArchivo;
+        enlace.href = canvas.toDataURL('image/png');
+        enlace.click();
+        alert('📸 ¡Imagen en Alta Resolución descargada con éxito! Ya puedes adjuntarla en tu grupo de WhatsApp.');
+    }, 'image/png');
+
+} catch(err){
+    alert('Error al generar la imagen. Intente nuevamente.');
+} finally{
+    btn.innerHTML = textoOriginal;
+    btn.disabled = false;
+}
+}
+
+// COPIAR TEXTO FORMATO WHATSAPP (RESPALDO RÁPIDO)
+function copiarResumenWhatsApp(){
+if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
+
 let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
 let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,cambio:0,otros:0};
-let otrosDetalles = [];
 
 partes.forEach(p=>{
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
@@ -719,90 +983,33 @@ nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.g
 nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.per+=(p.permiso||0);nov.sal+=(p.saliente||0);
 nov.hosp+=(p.hospitalizado||0);nov.fal+=(p.falta||0);nov.cambio+=(p.cambioDestino||0);
 nov.otros+=(p.otrosCantidad||0);
-
-if(p.otrosCantidad > 0 && p.otrosDetalle){
-otrosDetalles.push(`• ${p.unidad}: ${p.otrosDetalle} (${p.otrosCantidad})`);
-}
 });
 
 const noForman = tEf - tAsis;
-const pctPres = tEf > 0 ? Math.round((tAsis / tEf) * 100) : 0;
 
-let msg = `╔════════════════════════════════════╗\n`;
-msg += `  🏥 *HOSPITAL MILITAR CENTRAL "COSSMIL"*\n`;
-msg += `     *PARTE GENERAL CONSOLIDADO - U.A.P.*\n`;
-msg += `╚════════════════════════════════════╝\n`;
+let msg = `*MINISTERIO DE DEFENSA*\n`;
+msg += `*HOSPITAL MILITAR CENTRAL "COSSMIL"*\n`;
+msg += `*PARTE GENERAL CONSOLIDADO - U.A.P.*\n`;
 msg += `*FH.:* ${obtenerFechaMilitar()}\n\n`;
 
 msg += `*1. FUERZA EFECTIVA GENERAL:* ${tEf}\n`;
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-msg += `• Militar:              ${tMil}\n`;
-msg += `• Civil Ítem:           ${tItm}\n`;
-msg += `• Contrato P-121:       ${tP121}\n`;
-msg += `• Contrato P-251:       ${tP251}\n`;
-msg += `• Contrato P-252:       ${tP252}\n`;
-msg += `• Tropa / Seg.:         ${tTrp}\n`;
-msg += `────────────────────────────────────\n`;
-msg += `🟢 *FORMAN / ASISTEN:*   *${tAsis}* (${pctPres}%)\n`;
-msg += `🔴 *NO FORMAN:*          *${noForman}*\n`;
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+msg += `• Mil: ${tMil} | Ítem: ${tItm} | P-121: ${tP121}\n`;
+msg += `• P-251: ${tP251} | P-252: ${tP252} | Tropa: ${tTrp}\n`;
+msg += `🟢 *FORMAN / ASISTEN:* ${tAsis}\n`;
+msg += `🔴 *NO FORMAN:* ${noForman}\n\n`;
 
-msg += `*2. CUADRO NUMÉRICO DE NOVEDADES*\n`;
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-msg += `• Baja Médica:          ${nov.baja}\n`;
-msg += `• Vacación:             ${nov.vac}\n`;
-msg += `• P/Cuenta vacación:    ${nov.cta}\n`;
-msg += `• Guardia HMC:          ${nov.guardia}\n`;
-msg += `• P/Cumpleaños:         ${nov.cumple}\n`;
-msg += `• Comisión FAB:         ${nov.com}\n`;
-msg += `• Permiso Especial:     ${nov.per}\n`;
-msg += `• Turno Saliente:       ${nov.sal}\n`;
-msg += `• Hospitalizado:        ${nov.hosp}\n`;
-msg += `• Faltando:             ${nov.fal}\n`;
-msg += `• Cambio de destino:    ${nov.cambio}\n`;
-if(nov.otros > 0){
-msg += `• Otras Novedades:      ${nov.otros}\n`;
-}
-msg += `────────────────────────────────────\n`;
-msg += `*TOTAL NOVEDADES:*      *${noForman}*\n`;
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+msg += `*2. NOVEDADES REGISTRADAS*\n`;
+msg += `• Baja Médica: ${nov.baja}\n• Vacación: ${nov.vac}\n• P/Cta Vacación: ${nov.cta}\n• Guardia HMC: ${nov.guardia}\n• Comisión FAB: ${nov.com}\n`;
+if(nov.otros > 0) msg += `• Otros: ${nov.otros}\n`;
 
-if(otrosDetalles.length > 0){
-msg += `*DETALLE DE OTRAS NOVEDADES:*\n`;
-otrosDetalles.forEach(d => msg += `${d}\n`);
-msg += `\n`;
-}
-
-msg += `*3. DEMOSTRACIÓN NOMINAL*\n`;
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-let hayDem = false;
+msg += `\n*DEMOSTRACIÓN NOMINAL:*\n`;
 partes.forEach(p=>{
-if(p.demostracion){
-hayDem = true;
-msg += `*${p.unidad.toUpperCase()}*\n${p.demostracion}\n\n`;
-}
+if(p.demostracion) msg += `\n*${p.unidad.toUpperCase()}*\n${p.demostracion}\n`;
 });
-if(!hayDem) msg += `_Sin personal con novedad nominal registrada._\n\n`;
 
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-msg += `*ATTE.*\n`;
-msg += `*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\n`;
-msg += `Hospital Militar Central "COSSMIL"`;
+msg += `\n*ATTE.*\n*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\nHospital Militar Central "COSSMIL"`;
 
-return msg;
-}
-
-function copiarResumenWhatsApp(){
-if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
-const msg = construirMensajeWhatsApp();
-navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Parte General Consolidado copiado con éxito para WhatsApp!'));
-}
-
-function compartirWhatsAppDirecto(){
-if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
-const msg = construirMensajeWhatsApp();
-const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-window.open(url, '_blank');
+navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Texto copiado al portapapeles!'));
 }
 </script>
 </body>
