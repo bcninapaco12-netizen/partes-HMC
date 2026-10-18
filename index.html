@@ -48,7 +48,7 @@ Hospital Militar Central "COSSMIL"
 <div class="flex border-b border-slate-300 bg-white rounded-t-lg shadow-sm overflow-x-auto text-xs">
 <button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 mr-1.5"></i> 1. Formulario</button>
 <button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-list-check text-emerald-600 mr-1.5"></i> 2. Cumplimiento (<span id="tabCountCumplidos">0</span>)</button>
-<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-file-contract text-amber-600 mr-1.5"></i> 3. Parte General U.A.P.</button>
+<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-file-contract text-amber-600 mr-1.5"></i> 3. Parte General H.M.C.</button>
 <button onclick="switchTab('tablaResumen')" id="tab-tablaResumen" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-table-cells text-indigo-600 mr-1.5"></i> 4. Tabla Resumen Dinámica</button>
 </div>
 </nav>
@@ -197,20 +197,20 @@ Hospital Militar Central "COSSMIL"
 </div>
 </section>
 
-<!-- ================= 3. PARTE GENERAL (CON GENERADOR DE IMAGEN HD) ================= -->
+<!-- ================= 3. PARTE GENERAL (DISEÑO IDÉNTICO AL MODAL PARA IMAGEN WHATSAPP) ================= -->
 <section id="view-centralizado" class="bg-white rounded-b-lg shadow p-4 hidden">
 
 <!-- Barra de Acción y Botones -->
 <div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b pb-3 mb-4">
 <div>
 <h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
-<i class="fa-solid fa-file-contract text-blue-700"></i> Parte General Consolidado (U.A.P.)
+<i class="fa-solid fa-file-contract text-blue-700"></i> PARTE GENERAL H.M.C.
 </h2>
-<p class="text-[10px] text-slate-500">Documento ejecutivo institucional y exportación para WhatsApp</p>
+<p class="text-[10px] text-slate-500">Generador de imagen oficial para WhatsApp en alta definición</p>
 </div>
 <div class="flex flex-wrap gap-2">
-<!-- BOTÓN PRINCIPAL DE IMAGEN HD PARA WHATSAPP -->
-<button onclick="generarImagenWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
+<!-- BOTÓN PRINCIPAL DE GENERACIÓN DE IMAGEN -->
+<button onclick="generarImagenWhatsAppCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
 <i class="fa-solid fa-image text-emerald-200"></i> Descargar Imagen WhatsApp
 </button>
 <button onclick="copiarResumenWhatsApp()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
@@ -225,145 +225,77 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- TARJETAS DASHBOARD INTERACTIVAS (KPIs) -->
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-3 no-print">
-<div class="bg-gradient-to-br from-slate-900 to-blue-950 text-white p-3 rounded-xl shadow-sm border border-slate-700">
-<span class="text-[10px] uppercase font-bold text-blue-300 flex items-center justify-between">
-<span>Efectivo Total</span><i class="fa-solid fa-users text-blue-400"></i>
-</span>
-<div id="cardEfTotal" class="text-2xl font-black mt-1">0</div>
-<div class="text-[9px] text-slate-300 mt-1 font-mono">100% fuerza registrada</div>
+<!-- ================= TARJETA OFICIAL ESTILO MODAL PARA IMAGEN WHATSAPP ================= -->
+<div id="tarjetaReporteWhatsApp" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden text-xs">
+  
+  <!-- Encabezado Azul Oscuro Idéntico al Modal -->
+  <div class="bg-slate-900 text-white p-4 border-b border-slate-800">
+    <div class="flex justify-between items-start">
+      <div>
+        <h2 class="font-black text-base uppercase tracking-wider text-white flex items-center gap-2">
+          PARTE GENERAL H.M.C.
+        </h2>
+        <p class="text-[11px] text-slate-300 font-mono mt-0.5" id="cardReporteFH">
+          Enviado a las: -- | FH: --
+        </p>
+      </div>
+      <span class="bg-blue-800 text-blue-200 border border-blue-600 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+        U.A.P.
+      </span>
+    </div>
+  </div>
+
+  <div class="p-4 space-y-3.5 bg-white">
+    <!-- Bloque 1: Responsable Oficial -->
+    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl shadow-xs">
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">RESPONSABLE OFICIAL:</div>
+      <div class="text-xs font-black text-slate-900 mt-0.5 tracking-wide">
+        JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL
+      </div>
+    </div>
+
+    <!-- Bloque 2: Efectivo Desglosado con Botones -->
+    <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">EFECTIVO DESGLOSADO:</div>
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Mil: <span id="cardMil" class="text-slate-900">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Ítem: <span id="cardItm" class="text-slate-900">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-121: <span id="cardP121">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-251: <span id="cardP251">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-252: <span id="cardP252">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Trp: <span id="cardTrp" class="text-slate-900">0</span></div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-slate-200 flex justify-between items-center text-xs font-bold">
+        <span>Total Efectivo: <b id="cardTotalEf" class="text-slate-900 text-sm">0</b></span>
+        <span class="text-emerald-700">Forman: <b id="cardTotalForman" class="text-sm">0</b></span>
+        <span class="text-rose-700">No Forman: <b id="cardTotalNoForman" class="text-sm">0</b></span>
+      </div>
+    </div>
+
+    <!-- Bloque 3: Novedades Numéricas en 2 Columnas -->
+    <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">NOVEDADES NUMÉRICAS:</div>
+      <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-700 font-medium" id="cardListaNovedades">
+        <!-- Renderizado dinámico -->
+      </div>
+    </div>
+
+    <!-- Bloque 4: Demostración Nominal en Bloque Negro Terminal -->
+    <div>
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-1.5">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
+      <div id="cardDemostracionTerminal" class="bg-slate-950 text-slate-100 p-3.5 rounded-xl font-mono text-[11px] leading-relaxed whitespace-pre-line shadow-inner max-h-64 overflow-y-auto border border-slate-800">
+        Sin novedades registradas.
+      </div>
+    </div>
+
+    <!-- Sello y Pie Oficial -->
+    <div class="pt-2 text-center border-t border-slate-200">
+      <div class="text-[10px] font-black uppercase text-slate-800">MINISTERIO DE DEFENSA</div>
+      <div class="text-[9px] text-slate-500 font-semibold">Hospital Militar Central "COSSMIL"</div>
+    </div>
+  </div>
 </div>
 
-<div class="bg-gradient-to-br from-emerald-900 to-teal-950 text-white p-3 rounded-xl shadow-sm border border-emerald-700">
-<span class="text-[10px] uppercase font-bold text-emerald-300 flex items-center justify-between">
-<span>Forman / Asisten</span><i class="fa-solid fa-user-check text-emerald-400"></i>
-</span>
-<div id="cardForman" class="text-2xl font-black mt-1">0</div>
-<div id="pctForman" class="text-[9px] text-emerald-300 font-bold mt-1">0% presentes</div>
-</div>
-
-<div class="bg-gradient-to-br from-rose-950 to-red-900 text-white p-3 rounded-xl shadow-sm border border-rose-700">
-<span class="text-[10px] uppercase font-bold text-rose-300 flex items-center justify-between">
-<span>No Forman</span><i class="fa-solid fa-user-xmark text-rose-400"></i>
-</span>
-<div id="cardNoForman" class="text-2xl font-black mt-1">0</div>
-<div id="pctNoForman" class="text-[9px] text-rose-300 font-bold mt-1">0% ausentes</div>
-</div>
-
-<div class="bg-gradient-to-br from-indigo-950 to-slate-900 text-white p-3 rounded-xl shadow-sm border border-indigo-700">
-<span class="text-[10px] uppercase font-bold text-indigo-300 flex items-center justify-between">
-<span>Servicios</span><i class="fa-solid fa-building-circle-check text-indigo-400"></i>
-</span>
-<div id="cardServicios" class="text-2xl font-black mt-1">0</div>
-<div id="pctServicios" class="text-[9px] text-indigo-300 font-mono mt-1">0 de 13 unidades</div>
-</div>
-</div>
-
-<!-- BARRA DE ASISTENCIA GLOBAL -->
-<div class="bg-slate-50 border border-slate-200 p-2.5 rounded-lg mb-4 no-print flex flex-col gap-1.5">
-<div class="flex justify-between items-center text-[10px] font-bold">
-<span class="uppercase text-slate-600 flex items-center gap-1"><i class="fa-solid fa-gauge-high text-blue-700"></i> Nivel Global de Asistencia del Personal:</span>
-<span id="txtPorcentajeBarra" class="text-emerald-700 font-black">0%</span>
-</div>
-<div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-<div id="barraProgresoAsistencia" class="bg-emerald-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-</div>
-</div>
-
-<!-- BUSCADOR INTERACTIVO LIMPIO (SIN BOTONES INNECESARIOS) -->
-<div class="no-print bg-slate-50 border border-slate-200 p-2.5 rounded-lg mb-4">
-<div class="relative w-full">
-<i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-<input type="text" id="filtroTexto" oninput="filtrarDashboard()" placeholder="Escriba para filtrar servicios, responsables o militares..." class="w-full pl-8 pr-3 py-1.5 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-blue-600">
-</div>
-</div>
-
-<!-- ================= DOCUMENTO OFICIAL / FLYER PARA FOTO WHATSAPP ================= -->
-<div id="flyerOficialWhatsApp" class="border border-slate-300 p-5 rounded-lg bg-white shadow-sm max-w-5xl mx-auto text-xs">
-
-<div class="text-center border-b pb-3 mb-3">
-<!-- CAMBIO OFICIAL SOLICITADO: MINISTERIO DE DEFENSA -->
-<h3 class="text-[11px] tracking-widest font-black uppercase text-slate-700">Ministerio de Defensa</h3>
-<h2 class="text-sm font-black uppercase text-slate-900 mt-0.5">Hospital Militar Central "COSSMIL"</h2>
-<h4 class="text-[11px] font-bold uppercase text-blue-900 tracking-wider">Unidad de Administración de Personal (U.A.P.)</h4>
-<p class="text-[11px] font-mono mt-1 font-bold text-slate-700" id="docFH">FH.: --</p>
-</div>
-
-<div class="text-center my-3">
-<h2 class="font-black uppercase tracking-wider underline text-sm text-slate-900">PARTE GENERAL CONSOLIDADO DE PERSONAL</h2>
-</div>
-
-<!-- TABLA DE EFECTIVOS MILITARES -->
-<div class="overflow-x-auto my-3">
-<table class="w-full border-collapse border border-slate-400 text-center text-[10px]">
-<tr class="bg-slate-800 text-white font-bold uppercase">
-<td class="p-1.5 border border-slate-400">EFECTIVO</td>
-<td class="p-1.5 border border-slate-400">MILITAR</td>
-<td class="p-1.5 border border-slate-400">ÍTEM</td>
-<td class="p-1.5 border border-slate-400 bg-slate-700">P-121</td>
-<td class="p-1.5 border border-slate-400 bg-slate-700">P-251</td>
-<td class="p-1.5 border border-slate-400 bg-slate-700">P-252</td>
-<td class="p-1.5 border border-slate-400">TROPA</td>
-<td class="p-1.5 border border-slate-400 bg-emerald-700">FORMAN</td>
-<td class="p-1.5 border border-slate-400 bg-rose-800">NO FORMAN</td>
-</tr>
-<tr class="font-bold bg-slate-50 text-xs">
-<td id="resTotal" class="p-1.5 border text-blue-900 font-black">0</td>
-<td id="resMil" class="p-1.5 border">0</td>
-<td id="resItm" class="p-1.5 border">0</td>
-<td id="resP121" class="p-1.5 border">0</td>
-<td id="resP251" class="p-1.5 border">0</td>
-<td id="resP252" class="p-1.5 border">0</td>
-<td id="resTrp" class="p-1.5 border">0</td>
-<td id="resAsis" class="p-1.5 border text-emerald-800 font-black">0</td>
-<td id="resNov" class="p-1.5 border text-rose-800 font-black">0</td>
-</tr>
-</table>
-</div>
-
-<!-- CUADRO ESTADÍSTICO DE NOVEDADES -->
-<div class="my-4 bg-slate-50 border rounded-lg p-3">
-<h5 class="font-bold uppercase text-xs mb-2 text-slate-800 flex items-center gap-1.5">
-<i class="fa-solid fa-list-numeric text-amber-700"></i> Cuadro Estadístico de Novedades HMC
-</h5>
-<div id="cuadroNovedades" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs"></div>
-</div>
-
-<!-- DEMOSTRACIÓN NOMINAL AGRUPADA -->
-<div class="my-4">
-<h5 class="font-black uppercase text-xs mb-2 text-slate-900 border-b pb-1 flex items-center gap-1.5">
-<i class="fa-solid fa-address-book text-blue-800"></i> Demostración Nominal Consolidada
-</h5>
-<div id="contenedorDemostracionAgrupada" class="space-y-2.5 font-mono text-xs"></div>
-</div>
-
-<!-- DETALLE SERVICIO POR SERVICIO -->
-<div class="my-4">
-<h5 class="font-black uppercase text-xs mb-2 text-slate-900 border-b pb-1 flex items-center justify-between">
-<span class="flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-slate-700"></i> Detalle Desglosado por Secciones</span>
-</h5>
-<div id="detallePorServicio" class="space-y-2 text-[11px]"></div>
-</div>
-
-<!-- FIRMA DIGITAL OFICIAL -->
-<div class="mt-10 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px]">
-<div class="text-slate-500 font-mono">
-MINISTERIO DE DEFENSA<br>
-HOSPITAL MILITAR CENTRAL "COSSMIL"
-</div>
-<div class="text-center border-2 border-dashed border-slate-400 p-3 rounded-lg bg-slate-50 min-w-[280px]">
-<div class="text-emerald-700 font-bold uppercase text-[9px] mb-1 flex items-center justify-center gap-1">
-<i class="fa-solid fa-certificate"></i> FIRMA DIGITAL VALIDADA
-</div>
-<div class="font-black text-slate-900 uppercase text-xs tracking-wide">
-JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL
-</div>
-<div class="text-slate-500 text-[9px] mt-0.5">Hospital Militar Central "COSSMIL"</div>
-</div>
-</div>
-
-</div>
 </section>
 
 <!-- ================= 4. TABLA DINÁMICA RESUMEN DE TODAS LAS UNIDADES ================= -->
@@ -411,8 +343,8 @@ JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL
 
 <!-- ================= MODAL DETALLE DE CÓMO ENVIÓ LA UNIDAD ================= -->
 <div id="modalDetalleServicio" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
-<div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-300">
-<div class="bg-slate-900 text-white p-3.5 rounded-t-xl flex justify-between items-center">
+<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-300">
+<div class="bg-slate-900 text-white p-3.5 rounded-t-2xl flex justify-between items-center">
 <div>
 <h3 id="modalTituloServicio" class="font-black text-sm uppercase">Detalle del Servicio</h3>
 <p id="modalSubtituloServicio" class="text-[10px] text-slate-300">Comprobante de recepción en la nube</p>
@@ -420,7 +352,7 @@ JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL
 <button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-0.5"><i class="fa-solid fa-xmark"></i></button>
 </div>
 <div id="modalCuerpoDetalle" class="p-4 space-y-3 text-xs"></div>
-<div class="bg-slate-50 p-3 rounded-b-xl border-t text-right">
+<div class="bg-slate-50 p-3 rounded-b-2xl border-t text-right">
 <button onclick="cerrarModalDetalle()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Cerrar</button>
 </div>
 </div>
@@ -624,121 +556,66 @@ omisos.forEach((s,i)=>msg+=`${i+1}. *${s}* 🔴 (PENDIENTE)\n`);
 navigator.clipboard.writeText(msg).then(()=>alert('📋 Reporte de cumplimiento copiado para WhatsApp.'));
 }
 
-function filtrarDashboard(){
-renderizarCentralizado();
-}
-
-// RENDERIZADO VISUAL DEL DASHBOARD
+// RENDERIZADO DE LA TARJETA OFICIAL PARTE GENERAL H.M.C.
 function renderizarCentralizado(){
 const fhActual = obtenerFechaMilitar();
-document.getElementById('docFH').innerText=`FH.: ${fhActual} | ${new Date().toLocaleTimeString()}`;
+const horaActual = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+document.getElementById('cardReporteFH').innerText = `Enviado a las: ${horaActual} | FH: ${fhActual}`;
 
 let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
-let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,cambio:0,otros:0};
-let otrosDetalles = [];
-
-const cont=document.getElementById('detallePorServicio');
-const contDemostracion=document.getElementById('contenedorDemostracionAgrupada');
-cont.innerHTML='';
-contDemostracion.innerHTML='';
-
-const filtroTexto = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
-
-if(partes.length===0){
-cont.innerHTML='<div class="text-center py-6 text-slate-400 bg-slate-50 border border-dashed rounded-lg">No hay partes registrados en la nube hoy.</div>';
-contDemostracion.innerHTML='<div class="text-slate-400 italic">Sin demostración de novedades registrada.</div>';
-}
-
-let todasDemostraciones = [];
-let partesFiltrados = [];
+let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
+let listaDemostraciones = [];
 
 partes.forEach(p => {
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
 nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
-nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.per+=(p.permiso||0);nov.sal+=(p.saliente||0);
-nov.hosp+=(p.hospitalizado||0);nov.fal+=(p.falta||0);nov.cambio+=(p.cambioDestino||0);
-nov.otros+=(p.otrosCantidad||0);
+nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
+nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
 
-if(p.otrosCantidad > 0 && p.otrosDetalle){
-otrosDetalles.push(`${p.unidad}: ${p.otrosDetalle} (${p.otrosCantidad})`);
+if(p.demostracion && p.demostracion.trim().length > 0){
+listaDemostraciones.push(p.demostracion.trim());
 }
-
-if(p.demostracion) todasDemostraciones.push({unidad: p.unidad, texto: p.demostracion});
-
-let match = true;
-if(filtroTexto){
-match = p.unidad.toLowerCase().includes(filtroTexto) || 
-        p.responsable.toLowerCase().includes(filtroTexto) || 
-        (p.demostracion && p.demostracion.toLowerCase().includes(filtroTexto));
-}
-if(match) partesFiltrados.push(p);
 });
-
-partesFiltrados.forEach((p,i)=>{
-const novSec = p.efectivo - p.asisten;
-const d=document.createElement('div');
-d.className='border border-slate-200 p-2.5 rounded-lg bg-slate-50 hover:bg-white transition shadow-sm';
-d.innerHTML=`<div class="flex justify-between font-bold text-slate-900 border-b border-slate-200 pb-1 mb-1">
-<span>${i+1}. ${p.unidad.toUpperCase()} <span class="font-normal text-slate-500 text-[10px]">(${p.horaEnvio})</span></span>
-<span>Ef: ${p.efectivo} | Forman: <b class="text-emerald-700">${p.asisten}</b> | No Forman: <b class="${novSec>0?'text-rose-700':'text-slate-500'}">${novSec}</b></span>
-</div>
-<div class="text-slate-600 text-[10px]"><b>Resp:</b> ${p.responsable} (Mil:${p.mil} | Ítem:${p.itm} | P-121:${p.p121} | P-251:${p.p251} | P-252:${p.p252} | Tropa:${p.trp})</div>
-${p.otrosCantidad > 0 ? `<div class="text-amber-800 text-[10px] font-semibold mt-0.5">⚠️ Otros (${p.otrosCantidad}): ${p.otrosDetalle || 'Sin especificar'}</div>` : ''}
-${p.demostracion?`<div class="bg-white border p-1.5 rounded mt-1 font-mono text-[10px] text-slate-800 whitespace-pre-line">${p.demostracion}</div>`:''}`;
-cont.appendChild(d);
-});
-
-if(todasDemostraciones.length > 0){
-todasDemostraciones.forEach(item => {
-const block = document.createElement('div');
-block.className = 'bg-slate-50 border-l-4 border-blue-800 p-2.5 rounded-lg shadow-sm';
-block.innerHTML = `<div class="font-bold text-blue-900 text-[11px] uppercase mb-1">${item.unidad}:</div><div class="whitespace-pre-line text-slate-800 leading-relaxed">${item.texto}</div>`;
-contDemostracion.appendChild(block);
-});
-}
 
 const totalNoForman = tEf - tAsis;
-document.getElementById('cardEfTotal').innerText = tEf;
-document.getElementById('cardForman').innerText = tAsis;
-document.getElementById('cardNoForman').innerText = totalNoForman;
-document.getElementById('cardServicios').innerText = partes.length;
-document.getElementById('pctServicios').innerText = `${partes.length} de ${SERVICIOS_OFICIALES.length} unidades`;
 
-const pctF = tEf > 0 ? Math.round((tAsis / tEf) * 100) : 0;
-const pctNF = tEf > 0 ? Math.round((totalNoForman / tEf) * 100) : 0;
-document.getElementById('pctForman').innerText = `${pctF}% presentes`;
-document.getElementById('pctNoForman').innerText = `${pctNF}% ausentes`;
+// Llenado de badges de efectivo
+document.getElementById('cardMil').innerText = tMil;
+document.getElementById('cardItm').innerText = tItm;
+document.getElementById('cardP121').innerText = tP121;
+document.getElementById('cardP251').innerText = tP251;
+document.getElementById('cardP252').innerText = tP252;
+document.getElementById('cardTrp').innerText = tTrp;
 
-document.getElementById('txtPorcentajeBarra').innerText = `${pctF}%`;
-const barra = document.getElementById('barraProgresoAsistencia');
-barra.style.width = `${pctF}%`;
-barra.className = pctF >= 90 ? 'bg-emerald-600 h-full rounded-full transition-all duration-500' : (pctF >= 75 ? 'bg-amber-500 h-full rounded-full transition-all duration-500' : 'bg-rose-600 h-full rounded-full transition-all duration-500');
+document.getElementById('cardTotalEf').innerText = tEf;
+document.getElementById('cardTotalForman').innerText = tAsis;
+document.getElementById('cardTotalNoForman').innerText = totalNoForman;
 
-document.getElementById('resTotal').innerText=tEf;
-document.getElementById('resMil').innerText=tMil;
-document.getElementById('resItm').innerText=tItm;
-document.getElementById('resP121').innerText=tP121;
-document.getElementById('resP251').innerText=tP251;
-document.getElementById('resP252').innerText=tP252;
-document.getElementById('resTrp').innerText=tTrp;
-document.getElementById('resAsis').innerText=tAsis;
-document.getElementById('resNov').innerText=totalNoForman;
-
-document.getElementById('cuadroNovedades').innerHTML=`
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Baja Médica:</span><b class="text-rose-700">${nov.baja}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Vacación:</span><b>${nov.vac}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>P/Cuenta vacación:</span><b>${nov.cta}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Guardia HMC:</span><b>${nov.guardia}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>P/Cumpleaños:</span><b>${nov.cumple}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Comisión FAB:</span><b>${nov.com}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Hospitalizado:</span><b>${nov.hosp}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Faltando:</span><b class="text-rose-800">${nov.fal}</b></div>
-<div class="p-1.5 bg-white border rounded-lg shadow-xs flex justify-between"><span>Cambio destino:</span><b>${nov.cambio}</b></div>
-<div class="p-1.5 bg-amber-50 border border-amber-300 rounded-lg shadow-xs flex justify-between"><span>Otros (Manual):</span><b class="text-amber-900">${nov.otros}</b></div>
+// Llenado de 2 columnas de novedades
+document.getElementById('cardListaNovedades').innerHTML = `
+<div class="flex justify-between"><span>Baja:</span><b>${nov.baja}</b></div>
+<div class="flex justify-between"><span>Vacación:</span><b>${nov.vac}</b></div>
+<div class="flex justify-between"><span>P/Cta:</span><b>${nov.cta}</b></div>
+<div class="flex justify-between"><span>Guardia HMC:</span><b>${nov.guardia}</b></div>
+<div class="flex justify-between"><span>Cumpleaños:</span><b>${nov.cumple}</b></div>
+<div class="flex justify-between"><span>Comisión:</span><b>${nov.com}</b></div>
+<div class="flex justify-between"><span>Saliente:</span><b>${nov.sal}</b></div>
+<div class="flex justify-between"><span>Hospitalizado:</span><b>${nov.hosp}</b></div>
+<div class="flex justify-between"><span>Falta:</span><b>${nov.fal}</b></div>
+<div class="flex justify-between"><span>Otros:</span><b>${nov.otros}</b></div>
 `;
+
+// Llenado del bloque negro terminal
+const term = document.getElementById('cardDemostracionTerminal');
+if(listaDemostraciones.length > 0){
+term.innerText = listaDemostraciones.join('\n\n');
+} else {
+term.innerText = "SIN NOVEDADES REGISTRADAS (PERSONAL COMPLETO EN FORMACIÓN)";
+}
 }
 
-// ================= RENDERIZADO TABLA DINÁMICA (4TA PESTAÑA) =================
+// RENDERIZADO TABLA DINÁMICA (4TA PESTAÑA)
 function renderizarTablaDinamica(){
 const tbody = document.getElementById('cuerpoTablaDinamica');
 const tfoot = document.getElementById('pieTablaDinamica');
@@ -867,12 +744,12 @@ const noF = (p.efectivo||0) - (p.asisten||0);
 const cuerpo = document.getElementById('modalCuerpoDetalle');
 cuerpo.innerHTML = `
 <div class="bg-slate-50 border p-2.5 rounded-lg">
-<div class="text-[11px] font-bold text-slate-700 uppercase">Responsable Oficial:</div>
+<div class="text-[10px] font-bold text-slate-500 uppercase">RESPONSABLE OFICIAL:</div>
 <div class="text-xs font-black text-slate-900">${p.responsable}</div>
 </div>
 
 <div class="border rounded-lg p-2.5 bg-blue-50/50">
-<div class="text-[10px] font-bold uppercase text-blue-900 mb-1">Efectivo Desglosado:</div>
+<div class="text-[10px] font-bold uppercase text-blue-900 mb-1">EFECTIVO DESGLOSADO:</div>
 <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
 <div class="bg-white p-1 rounded border">Mil: <b>${p.mil}</b></div>
 <div class="bg-white p-1 rounded border">Ítem: <b>${p.itm}</b></div>
@@ -889,7 +766,7 @@ cuerpo.innerHTML = `
 </div>
 
 <div class="border rounded-lg p-2.5 bg-amber-50/40">
-<div class="text-[10px] font-bold uppercase text-amber-900 mb-1">Novedades Numéricas:</div>
+<div class="text-[10px] font-bold uppercase text-amber-900 mb-1">NOVEDADES NUMÉRICAS:</div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
 <div>Baja: <b>${p.baja||0}</b></div>
 <div>Vacación: <b>${p.vacacion||0}</b></div>
@@ -904,7 +781,7 @@ ${p.otrosCantidad > 0 ? `<div class="mt-1 pt-1 border-t text-[10px] text-amber-9
 </div>
 
 <div>
-<div class="text-[10px] font-bold uppercase text-slate-700 mb-1">Demostración Nominal Enviada:</div>
+<div class="text-[10px] font-bold uppercase text-slate-700 mb-1">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
 <div class="bg-slate-900 text-slate-100 p-2.5 rounded-lg font-mono text-[10px] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
 ${p.demostracion ? p.demostracion : 'Sin demostración nominal.'}
 </div>
@@ -918,8 +795,8 @@ function cerrarModalDetalle(){
 document.getElementById('modalDetalleServicio').classList.add('hidden');
 }
 
-// ================= GENERADOR DE IMAGEN HD PARA WHATSAPP =================
-async function generarImagenWhatsApp(){
+// ================= GENERADOR DE IMAGEN ESTILO MODAL PARA WHATSAPP =================
+async function generarImagenWhatsAppCard(){
 if(partes.length===0) return alert('No hay partes registrados para generar la imagen.');
 
 const btn = event.currentTarget;
@@ -928,10 +805,10 @@ btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generando Imag
 btn.disabled = true;
 
 try{
-    const flyer = document.getElementById('flyerOficialWhatsApp');
+    const tarjeta = document.getElementById('tarjetaReporteWhatsApp');
     
-    // Captura con html2canvas en alta resolución (escala 2)
-    const canvas = await html2canvas(flyer, {
+    // Captura exacta con escala 2X para alta definición en WhatsApp
+    const canvas = await html2canvas(tarjeta, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
@@ -939,27 +816,25 @@ try{
     });
 
     canvas.toBlob(async (blob) => {
-        const nombreArchivo = `PARTE_HMC_${obtenerFechaMilitar()}.png`;
+        const nombreArchivo = `PARTE_GENERAL_HMC_${obtenerFechaMilitar()}.png`;
         const file = new File([blob], nombreArchivo, { type: 'image/png' });
 
-        // Intentar compartir directo a WhatsApp si el celular lo soporta
         if(navigator.canShare && navigator.canShare({ files: [file] })){
             try {
                 await navigator.share({
                     files: [file],
-                    title: 'PARTE GENERAL HMC',
-                    text: `PARTE GENERAL CONSOLIDADO HMC - U.A.P.`
+                    title: 'PARTE GENERAL H.M.C.',
+                    text: `PARTE GENERAL H.M.C. - U.A.P.`
                 });
                 return;
             } catch (err) {}
         }
 
-        // Descarga automática de la imagen para adjuntar en WhatsApp
         const enlace = document.createElement('a');
         enlace.download = nombreArchivo;
         enlace.href = canvas.toDataURL('image/png');
         enlace.click();
-        alert('📸 ¡Imagen en Alta Resolución descargada con éxito! Ya puedes adjuntarla en tu grupo de WhatsApp.');
+        alert('📸 ¡Imagen oficial de PARTE GENERAL H.M.C. generada y descargada! Ya puedes compartirla en WhatsApp.');
     }, 'image/png');
 
 } catch(err){
@@ -970,7 +845,7 @@ try{
 }
 }
 
-// COPIAR TEXTO FORMATO WHATSAPP (RESPALDO RÁPIDO)
+// COPIAR TEXTO FORMATO WHATSAPP (RESPALDO)
 function copiarResumenWhatsApp(){
 if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
 
@@ -980,37 +855,15 @@ let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,ca
 partes.forEach(p=>{
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
 nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
-nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.per+=(p.permiso||0);nov.sal+=(p.saliente||0);
-nov.hosp+=(p.hospitalizado||0);nov.fal+=(p.falta||0);nov.cambio+=(p.cambioDestino||0);
-nov.otros+=(p.otrosCantidad||0);
+nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
+nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
 });
 
 const noForman = tEf - tAsis;
 
-let msg = `*MINISTERIO DE DEFENSA*\n`;
-msg += `*HOSPITAL MILITAR CENTRAL "COSSMIL"*\n`;
-msg += `*PARTE GENERAL CONSOLIDADO - U.A.P.*\n`;
+let msg = `*PARTE GENERAL H.M.C.*\n`;
+msg += `*MINISTERIO DE DEFENSA*\n`;
 msg += `*FH.:* ${obtenerFechaMilitar()}\n\n`;
 
-msg += `*1. FUERZA EFECTIVA GENERAL:* ${tEf}\n`;
-msg += `• Mil: ${tMil} | Ítem: ${tItm} | P-121: ${tP121}\n`;
-msg += `• P-251: ${tP251} | P-252: ${tP252} | Tropa: ${tTrp}\n`;
-msg += `🟢 *FORMAN / ASISTEN:* ${tAsis}\n`;
-msg += `🔴 *NO FORMAN:* ${noForman}\n\n`;
-
-msg += `*2. NOVEDADES REGISTRADAS*\n`;
-msg += `• Baja Médica: ${nov.baja}\n• Vacación: ${nov.vac}\n• P/Cta Vacación: ${nov.cta}\n• Guardia HMC: ${nov.guardia}\n• Comisión FAB: ${nov.com}\n`;
-if(nov.otros > 0) msg += `• Otros: ${nov.otros}\n`;
-
-msg += `\n*DEMOSTRACIÓN NOMINAL:*\n`;
-partes.forEach(p=>{
-if(p.demostracion) msg += `\n*${p.unidad.toUpperCase()}*\n${p.demostracion}\n`;
-});
-
-msg += `\n*ATTE.*\n*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\nHospital Militar Central "COSSMIL"`;
-
-navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Texto copiado al portapapeles!'));
-}
-</script>
-</body>
-</html>
+msg += `*1. EFECTIVO GENERAL:* ${tEf}\n`;
+msg += `• Mil: ${tMil}
