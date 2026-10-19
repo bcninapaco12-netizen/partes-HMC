@@ -28,7 +28,7 @@ Hospital Militar Central "COSSMIL"
 <span id="dotEstado" class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
 <span id="txtEstadoNube" class="font-medium text-emerald-400">Google Firebase: En Línea</span>
 <span class="text-slate-500">•</span>
-<span id="txtUltimaSync" class="text-slate-400 text-[10px]">Iniciando...</span>
+<span id="txtUltimaSync" class="text-slate-400 text-[10px]">Sincronizando...</span>
 </p>
 </div>
 </div>
@@ -195,7 +195,7 @@ Hospital Militar Central "COSSMIL"
 </div>
 </section>
 
-<!-- ================= 3. PARTE GENERAL (TARJETA MODAL PARA IMAGEN) ================= -->
+<!-- ================= 3. PARTE GENERAL (CON DEMOSTRACIÓN CLASIFICADA POR ÁREA) ================= -->
 <section id="view-centralizado" class="bg-white rounded-b-lg shadow p-4 hidden">
 
 <div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b pb-3 mb-4">
@@ -203,7 +203,7 @@ Hospital Militar Central "COSSMIL"
 <h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
 <i class="fa-solid fa-file-contract text-blue-700"></i> PARTE GENERAL H.M.C.
 </h2>
-<p class="text-[10px] text-slate-500">Reporte oficial consolidado en imagen HD para WhatsApp</p>
+<p class="text-[10px] text-slate-500">Reporte oficial con novedades clasificadas de forma clara por área</p>
 </div>
 <div class="flex flex-wrap gap-2">
 <button onclick="generarImagenWhatsAppCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
@@ -221,7 +221,7 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- ================= TARJETA OFICIAL ESTILO MODAL ================= -->
+<!-- ================= TARJETA OFICIAL ESTILO MODAL PARA IMAGEN ================= -->
 <div id="tarjetaReporteWhatsApp" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden text-xs">
   
   <div class="bg-slate-900 text-white p-4 border-b border-slate-800">
@@ -270,9 +270,13 @@ Hospital Militar Central "COSSMIL"
       <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-700 font-medium" id="cardListaNovedades"></div>
     </div>
 
+    <!-- DEMOSTRACIÓN CLASIFICADA POR ÁREA -->
     <div>
-      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-1.5">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
-      <div id="cardDemostracionTerminal" class="bg-slate-950 text-slate-100 p-3.5 rounded-xl font-mono text-[11px] leading-relaxed whitespace-pre-line shadow-inner max-h-64 overflow-y-auto border border-slate-800">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+        <span>DEMOSTRACIÓN NOMINAL ENVIADA (POR ÁREAS):</span>
+        <span class="text-[9px] text-slate-400 font-normal">Clasificado por unidad</span>
+      </div>
+      <div id="cardDemostracionTerminal" class="bg-slate-950 text-slate-100 p-3.5 rounded-xl font-mono text-[11px] leading-relaxed whitespace-pre-line shadow-inner max-h-72 overflow-y-auto border border-slate-800">
         Sin novedades registradas.
       </div>
     </div>
@@ -370,6 +374,7 @@ var meses=["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DI
 return `${dia}${h}${m}-${meses[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`;
 }
 
+// Reloj inmediato sin demora
 function actualizarReloj(){
 var ahora = new Date();
 var str = `FH: ${obtenerFechaMilitar(ahora)} (${ahora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})})`;
@@ -558,6 +563,7 @@ omisos.forEach((s,i)=>msg+=`${i+1}. *${s}* 🔴 (PENDIENTE)\n`);
 navigator.clipboard.writeText(msg).then(()=>alert('📋 Reporte de cumplimiento copiado para WhatsApp.'));
 }
 
+// RENDERIZADO DE LA TARJETA OFICIAL CON DEMOSTRACIÓN CLASIFICADA POR ÁREAS
 function renderizarCentralizado(){
 var fhActual = obtenerFechaMilitar();
 var horaActual = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -566,7 +572,8 @@ setTxt('cardReporteFH', `Enviado a las: ${horaActual} | FH: ${fhActual}`);
 
 var tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
 var nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
-var listaDemostraciones = [];
+
+var bloquesDemostracionPorArea = [];
 
 partes.forEach(p => {
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
@@ -574,8 +581,24 @@ nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.g
 nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
 nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
 
-if(p.demostracion && p.demostracion.trim().length > 0){
-listaDemostraciones.push(p.demostracion.trim());
+var noFormanUnidad = (p.efectivo||0) - (p.asisten||0);
+var tieneTexto = p.demostracion && p.demostracion.trim().length > 0;
+var tieneOtros = p.otrosCantidad > 0 && p.otrosDetalle;
+
+// Clasificación estricta por área
+if(noFormanUnidad > 0 || tieneTexto || tieneOtros){
+    var tituloArea = `■ ${p.unidad.toUpperCase()} (Novedades: ${noFormanUnidad}):`;
+    var cuerpoArea = [];
+    if(tieneTexto){
+        cuerpoArea.push(p.demostracion.trim());
+    }
+    if(tieneOtros){
+        cuerpoArea.push(`• OTROS: ${p.otrosDetalle} (${p.otrosCantidad})`);
+    }
+    if(!tieneTexto && !tieneOtros){
+        cuerpoArea.push(`• Personal ausente: ${noFormanUnidad} (Sin nombres detallados)`);
+    }
+    bloquesDemostracionPorArea.push(`${tituloArea}\n${cuerpoArea.join('\n')}`);
 }
 });
 
@@ -605,16 +628,18 @@ setHtml('cardListaNovedades', `
 <div class="flex justify-between"><span>Otros:</span><b>${nov.otros}</b></div>
 `);
 
+// Inyectar en el recuadro negro terminal la demostración clasificada
 var term = document.getElementById('cardDemostracionTerminal');
 if(term){
-    if(listaDemostraciones.length > 0){
-        term.innerText = listaDemostraciones.join('\n\n');
+    if(bloquesDemostracionPorArea.length > 0){
+        term.innerText = bloquesDemostracionPorArea.join('\n\n');
     } else {
         term.innerText = "SIN NOVEDADES REGISTRADAS (PERSONAL COMPLETO EN FORMACIÓN)";
     }
 }
 }
 
+// RENDERIZADO TABLA DINÁMICA (4TA PESTAÑA)
 function renderizarTablaDinamica(){
 var tbody = document.getElementById('cuerpoTablaDinamica');
 var tfoot = document.getElementById('pieTablaDinamica');
@@ -866,11 +891,24 @@ if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
 var tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
 var nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
 
+var bloquesWhatsAppAreas = [];
+
 partes.forEach(p=>{
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
 nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
 nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
 nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
+
+var noF = (p.efectivo||0) - (p.asisten||0);
+var tieneTxt = p.demostracion && p.demostracion.trim().length > 0;
+var tieneOtr = p.otrosCantidad > 0 && p.otrosDetalle;
+
+if(noF > 0 || tieneTxt || tieneOtr){
+    var txtUnidad = `■ *${p.unidad.toUpperCase()}* (Nov: ${noF})\n`;
+    if(tieneTxt) txtUnidad += `${p.demostracion.trim()}\n`;
+    if(tieneOtr) txtUnidad += `• Otros: ${p.otrosDetalle} (${p.otrosCantidad})\n`;
+    bloquesWhatsAppAreas.push(txtUnidad.trim());
+}
 });
 
 var noForman = tEf - tAsis;
@@ -888,14 +926,18 @@ msg += `🔴 *NO FORMAN:* ${noForman}\n\n`;
 msg += `*2. NOVEDADES REGISTRADAS*\n`;
 msg += `• Baja: ${nov.baja} | Vacación: ${nov.vac}\n• P/Cta: ${nov.cta} | Guardia: ${nov.guardia}\n• Comisión: ${nov.com} | Otros: ${nov.otros}\n\n`;
 
-msg += `*DEMOSTRACIÓN NOMINAL:*\n`;
-partes.forEach(p=>{
-if(p.demostracion) msg += `\n*${p.unidad.toUpperCase()}*\n${p.demostracion}\n`;
-});
+msg += `*3. DEMOSTRACIÓN NOMINAL POR ÁREAS:*\n`;
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+if(bloquesWhatsAppAreas.length > 0){
+    msg += bloquesWhatsAppAreas.join('\n\n') + '\n';
+} else {
+    msg += `_Sin novedades de personal registradas en ninguna unidad._\n`;
+}
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-msg += `\n*ATTE.*\n*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\nHospital Militar Central "COSSMIL"`;
+msg += `*ATTE.*\n*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\nHospital Militar Central "COSSMIL"`;
 
-navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Texto copiado al portapapeles!'));
+navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Texto copiado al portapapeles con novedades clasificadas por área!'));
 }
 </script>
 </body>
