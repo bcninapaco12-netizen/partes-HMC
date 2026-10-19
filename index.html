@@ -5,8 +5,6 @@
 <title>Dashboard Partes HMC COSSMIL</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Motor de Generación de Imagen HD -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 .active-tab{border-bottom:3px solid #1e3a8a;color:#1e3a8a;font-weight:700;background:#f8fafc}
 @media print{header,nav,.no-print{display:none!important}#view-centralizado{display:block!important;padding:0!important}}
@@ -27,15 +25,15 @@ Hospital Militar Central "COSSMIL"
 <span class="bg-blue-700 text-blue-200 text-[9px] px-1.5 py-0.5 rounded font-mono font-bold">U.A.P.</span>
 </h1>
 <p class="text-[11px] text-slate-300 flex items-center gap-1.5 mt-0.5">
-<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-<span id="txtEstadoNube" class="font-medium text-emerald-400">Google Firebase: En Línea</span>
+<span id="dotEstado" class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span id="txtEstadoNube" class="font-medium text-emerald-400">Google Firebase: Conectando...</span>
 <span class="text-slate-500">•</span>
-<span id="txtUltimaSync" class="text-slate-400 text-[10px]">Sincronizando...</span>
+<span id="txtUltimaSync" class="text-slate-400 text-[10px]">Iniciando...</span>
 </p>
 </div>
 </div>
 <div class="flex items-center gap-2">
-<span id="relojVivo" class="text-xs bg-slate-800/90 px-2.5 py-1.5 rounded-lg font-mono text-emerald-400 border border-slate-700 shadow-inner">FH: --</span>
+<span id="relojVivo" class="text-xs bg-slate-800/90 px-2.5 py-1.5 rounded-lg font-mono text-emerald-400 border border-slate-700 shadow-inner">FH: Calculando...</span>
 <button onclick="restablecerNuevoDia()" class="no-print bg-rose-700 hover:bg-rose-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
 <i class="fa-solid fa-rotate-right"></i> Nuevo Día
 </button>
@@ -197,19 +195,17 @@ Hospital Militar Central "COSSMIL"
 </div>
 </section>
 
-<!-- ================= 3. PARTE GENERAL (DISEÑO IDÉNTICO AL MODAL PARA IMAGEN WHATSAPP) ================= -->
+<!-- ================= 3. PARTE GENERAL (TARJETA IDÉNTICA AL MODAL) ================= -->
 <section id="view-centralizado" class="bg-white rounded-b-lg shadow p-4 hidden">
 
-<!-- Barra de Acción y Botones -->
 <div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b pb-3 mb-4">
 <div>
 <h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
 <i class="fa-solid fa-file-contract text-blue-700"></i> PARTE GENERAL H.M.C.
 </h2>
-<p class="text-[10px] text-slate-500">Generador de imagen oficial para WhatsApp en alta definición</p>
+<p class="text-[10px] text-slate-500">Reporte oficial consolidado en imagen HD para WhatsApp</p>
 </div>
 <div class="flex flex-wrap gap-2">
-<!-- BOTÓN PRINCIPAL DE GENERACIÓN DE IMAGEN -->
 <button onclick="generarImagenWhatsAppCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
 <i class="fa-solid fa-image text-emerald-200"></i> Descargar Imagen WhatsApp
 </button>
@@ -225,18 +221,18 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- ================= TARJETA OFICIAL ESTILO MODAL PARA IMAGEN WHATSAPP ================= -->
+<!-- ================= TARJETA OFICIAL ESTILO MODAL ================= -->
 <div id="tarjetaReporteWhatsApp" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden text-xs">
   
-  <!-- Encabezado Azul Oscuro Idéntico al Modal -->
+  <!-- Encabezado Azul Oscuro -->
   <div class="bg-slate-900 text-white p-4 border-b border-slate-800">
     <div class="flex justify-between items-start">
       <div>
-        <h2 class="font-black text-base uppercase tracking-wider text-white flex items-center gap-2">
+        <h2 class="font-black text-base uppercase tracking-wider text-white">
           PARTE GENERAL H.M.C.
         </h2>
         <p class="text-[11px] text-slate-300 font-mono mt-0.5" id="cardReporteFH">
-          Enviado a las: -- | FH: --
+          FH: Calculando...
         </p>
       </div>
       <span class="bg-blue-800 text-blue-200 border border-blue-600 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
@@ -254,7 +250,7 @@ Hospital Militar Central "COSSMIL"
       </div>
     </div>
 
-    <!-- Bloque 2: Efectivo Desglosado con Botones -->
+    <!-- Bloque 2: Efectivo Desglosado -->
     <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
       <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">EFECTIVO DESGLOSADO:</div>
       <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
@@ -272,15 +268,15 @@ Hospital Militar Central "COSSMIL"
       </div>
     </div>
 
-    <!-- Bloque 3: Novedades Numéricas en 2 Columnas -->
+    <!-- Bloque 3: Novedades Numéricas -->
     <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
       <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">NOVEDADES NUMÉRICAS:</div>
       <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-700 font-medium" id="cardListaNovedades">
-        <!-- Renderizado dinámico -->
+        <!-- Generado en JS -->
       </div>
     </div>
 
-    <!-- Bloque 4: Demostración Nominal en Bloque Negro Terminal -->
+    <!-- Bloque 4: Demostración Nominal Terminal -->
     <div>
       <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-1.5">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
       <div id="cardDemostracionTerminal" class="bg-slate-950 text-slate-100 p-3.5 rounded-xl font-mono text-[11px] leading-relaxed whitespace-pre-line shadow-inner max-h-64 overflow-y-auto border border-slate-800">
@@ -288,7 +284,7 @@ Hospital Militar Central "COSSMIL"
       </div>
     </div>
 
-    <!-- Sello y Pie Oficial -->
+    <!-- Sello Oficial -->
     <div class="pt-2 text-center border-t border-slate-200">
       <div class="text-[10px] font-black uppercase text-slate-800">MINISTERIO DE DEFENSA</div>
       <div class="text-[9px] text-slate-500 font-semibold">Hospital Militar Central "COSSMIL"</div>
@@ -298,14 +294,14 @@ Hospital Militar Central "COSSMIL"
 
 </section>
 
-<!-- ================= 4. TABLA DINÁMICA RESUMEN DE TODAS LAS UNIDADES ================= -->
+<!-- ================= 4. TABLA DINÁMICA RESUMEN ================= -->
 <section id="view-tablaResumen" class="bg-white rounded-b-lg shadow p-4 hidden">
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
 <div>
 <h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
 <i class="fa-solid fa-table-cells text-indigo-700"></i> Matriz Dinámica Resumen de Unidades
 </h2>
-<p class="text-[10px] text-slate-500">Supervisión comparativa e inspección detallada de cómo envió cada servicio</p>
+<p class="text-[10px] text-slate-500">Supervisión comparativa e inspección de comprobantes</p>
 </div>
 <div class="flex items-center gap-2">
 <select id="filtroRapidoUnidad" onchange="filtrarTablaPorSelect(this.value)" class="border rounded-lg p-1.5 text-xs bg-slate-50 outline-none">
@@ -314,7 +310,6 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- TABLA MATRIZ CON ORDENAMIENTO -->
 <div class="overflow-x-auto my-2 border border-slate-200 rounded-lg shadow-xs">
 <table class="w-full border-collapse text-left text-xs">
 <thead>
@@ -373,29 +368,9 @@ let partes=[];
 let ordenActualColumna = '';
 let ordenAscendente = true;
 
-async function cargarPartesDeLaNube(){
-    try{
-        const res = await fetch(`${URL_FIREBASE}.json`);
-        if(res.ok){
-            const data = await res.json();
-            partes = data ? Object.values(data) : [];
-            const ahora = new Date();
-            document.getElementById('txtUltimaSync').innerText = `Sinc: ${ahora.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
-            document.getElementById('txtEstadoNube').innerText = "Google Firebase: En Línea";
-            document.getElementById('txtEstadoNube').className = "font-medium text-emerald-400";
-            renderizarCumplimiento();
-            renderizarCentralizado();
-            renderizarTablaDinamica();
-            actualizarSelectUnidades();
-        }
-    }catch(err){
-        document.getElementById('txtEstadoNube').innerText = "Reintentando conexión...";
-        document.getElementById('txtEstadoNube').className = "font-medium text-amber-400";
-    }
-}
-
-// Sincronización automática cada 6 segundos
-setInterval(cargarPartesDeLaNube, 6000);
+// Helper de seguridad para evitar cuelgues por elementos ausentes
+function setTxt(id, val){ const el = document.getElementById(id); if(el) el.innerText = val; }
+function setHtml(id, val){ const el = document.getElementById(id); if(el) el.innerHTML = val; }
 
 function obtenerFechaMilitar(d=new Date()){
 const dia=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),m=String(d.getMinutes()).padStart(2,'0');
@@ -403,17 +378,45 @@ const meses=["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","
 return `${dia}${h}${m}-${meses[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`;
 }
 
-setInterval(()=>{
-const ahora=new Date();
-const r=document.getElementById('relojVivo');
-if(r) r.innerText=`FH: ${obtenerFechaMilitar(ahora)} (${ahora.toLocaleTimeString()})`;
-},1000);
+// Reloj inmediato sin esperar 1 segundo
+function actualizarReloj(){
+const ahora = new Date();
+const str = `FH: ${obtenerFechaMilitar(ahora)} (${ahora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})})`;
+setTxt('relojVivo', str);
+}
+actualizarReloj();
+setInterval(actualizarReloj, 1000);
+
+async function cargarPartesDeLaNube(){
+    try{
+        const res = await fetch(`${URL_FIREBASE}.json`);
+        if(res.ok){
+            const data = await res.json();
+            partes = data ? Object.values(data) : [];
+            const ahora = new Date();
+            setTxt('txtUltimaSync', `Sinc: ${ahora.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+            setTxt('txtEstadoNube', `Google Firebase: En Línea (${partes.length} recibidos)`);
+            const dot = document.getElementById('dotEstado');
+            if(dot) dot.className = "inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            renderizarCumplimiento();
+            renderizarCentralizado();
+            renderizarTablaDinamica();
+            actualizarSelectUnidades();
+        }
+    }catch(err){
+        setTxt('txtEstadoNube', "Reintentando sincronización...");
+        const dot = document.getElementById('dotEstado');
+        if(dot) dot.className = "inline-block w-2 h-2 rounded-full bg-amber-400";
+    }
+}
+setInterval(cargarPartesDeLaNube, 6000);
 
 function switchTab(t){
 ['registro','cumplimiento','centralizado','tablaResumen'].forEach(v=>{
-document.getElementById(`view-${v}`).classList.toggle('hidden',v!==t);
+const sec = document.getElementById(`view-${v}`);
+if(sec) sec.classList.toggle('hidden', v!==t);
 const b=document.getElementById(`tab-${v}`);
-b.className=v===t?'px-4 py-2.5 active-tab whitespace-nowrap':'px-4 py-2.5 text-slate-600 whitespace-nowrap';
+if(b) b.className=v===t?'px-4 py-2.5 active-tab whitespace-nowrap':'px-4 py-2.5 text-slate-600 whitespace-nowrap';
 });
 if(t==='cumplimiento') renderizarCumplimiento();
 if(t==='centralizado') renderizarCentralizado();
@@ -422,6 +425,7 @@ if(t==='tablaResumen') renderizarTablaDinamica();
 
 function verificarOtro(v){
 const m=document.getElementById('unidadManual');
+if(!m) return;
 if(v==='__OTRO__'){m.classList.remove('hidden');m.required=true;m.focus()}
 else{m.classList.add('hidden');m.required=false}
 }
@@ -433,23 +437,30 @@ const ef=n('mil')+n('itm')+n('p121')+n('p251')+n('p252')+n('trp');
 const aus=n('novBaja')+n('novVacacion')+n('novCtaVacacion')+n('novGuardia')+n('novCumple')+n('novComision')+n('novPermiso')+n('novSaliente')+n('novHosp')+n('novFalta')+n('novCambio')+n('novOtros');
 const forman=Math.max(0,ef-aus);
 
-document.getElementById('txtEfectivoTotal').innerText=ef;
-document.getElementById('txtTotalAusentes').innerText=aus;
-document.getElementById('resumenFormulaEf').innerText=ef;
-document.getElementById('resumenFormulaNov').innerText=aus;
-document.getElementById('resumenFormulaForman').innerText=forman;
+setTxt('txtEfectivoTotal', ef);
+setTxt('txtTotalAusentes', aus);
+setTxt('resumenFormulaEf', ef);
+setTxt('resumenFormulaNov', aus);
+setTxt('resumenFormulaForman', forman);
 const asis=document.getElementById('novAsiste');
 if(asis) asis.value=forman;
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
-document.querySelectorAll('.calc-efectivo,.calc-novedad').forEach(i=>{
-i.addEventListener('input',recalcularTodo);
-i.addEventListener('change',recalcularTodo);
-});
-recalcularTodo();
-cargarPartesDeLaNube();
-});
+// Arranque inmediato a prueba de fallos
+function initApp(){
+    actualizarReloj();
+    document.querySelectorAll('.calc-efectivo,.calc-novedad').forEach(i=>{
+        i.addEventListener('input',recalcularTodo);
+        i.addEventListener('change',recalcularTodo);
+    });
+    recalcularTodo();
+    cargarPartesDeLaNube();
+}
+if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
 async function guardarParte(e){
 e.preventDefault();
@@ -516,6 +527,7 @@ try{
 
 function renderizarCumplimiento(){
 const c=document.getElementById('listaCumplieron'),f=document.getElementById('listaFaltan');
+if(!c || !f) return;
 c.innerHTML='';f.innerHTML='';
 const env=partes.map(p=>p.unidad.toLowerCase());
 let ok=0,pend=0;
@@ -537,9 +549,9 @@ d.innerHTML=`<span class="text-rose-900 font-semibold">${s}</span><span class="b
 f.appendChild(d);
 }
 });
-document.getElementById('countCumplieron').innerText=ok;
-document.getElementById('countFaltan').innerText=pend;
-document.getElementById('tabCountCumplidos').innerText=`${ok}/${ok+pend}`;
+setTxt('countCumplieron', ok);
+setTxt('countFaltan', pend);
+setTxt('tabCountCumplidos', `${ok}/${ok+pend}`);
 }
 
 function copiarReporteCumplimiento(){
@@ -561,7 +573,7 @@ function renderizarCentralizado(){
 const fhActual = obtenerFechaMilitar();
 const horaActual = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
-document.getElementById('cardReporteFH').innerText = `Enviado a las: ${horaActual} | FH: ${fhActual}`;
+setTxt('cardReporteFH', `Enviado a las: ${horaActual} | FH: ${fhActual}`);
 
 let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
 let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
@@ -580,20 +592,18 @@ listaDemostraciones.push(p.demostracion.trim());
 
 const totalNoForman = tEf - tAsis;
 
-// Llenado de badges de efectivo
-document.getElementById('cardMil').innerText = tMil;
-document.getElementById('cardItm').innerText = tItm;
-document.getElementById('cardP121').innerText = tP121;
-document.getElementById('cardP251').innerText = tP251;
-document.getElementById('cardP252').innerText = tP252;
-document.getElementById('cardTrp').innerText = tTrp;
+setTxt('cardMil', tMil);
+setTxt('cardItm', tItm);
+setTxt('cardP121', tP121);
+setTxt('cardP251', tP251);
+setTxt('cardP252', tP252);
+setTxt('cardTrp', tTrp);
 
-document.getElementById('cardTotalEf').innerText = tEf;
-document.getElementById('cardTotalForman').innerText = tAsis;
-document.getElementById('cardTotalNoForman').innerText = totalNoForman;
+setTxt('cardTotalEf', tEf);
+setTxt('cardTotalForman', tAsis);
+setTxt('cardTotalNoForman', totalNoForman);
 
-// Llenado de 2 columnas de novedades
-document.getElementById('cardListaNovedades').innerHTML = `
+setHtml('cardListaNovedades', `
 <div class="flex justify-between"><span>Baja:</span><b>${nov.baja}</b></div>
 <div class="flex justify-between"><span>Vacación:</span><b>${nov.vac}</b></div>
 <div class="flex justify-between"><span>P/Cta:</span><b>${nov.cta}</b></div>
@@ -604,14 +614,15 @@ document.getElementById('cardListaNovedades').innerHTML = `
 <div class="flex justify-between"><span>Hospitalizado:</span><b>${nov.hosp}</b></div>
 <div class="flex justify-between"><span>Falta:</span><b>${nov.fal}</b></div>
 <div class="flex justify-between"><span>Otros:</span><b>${nov.otros}</b></div>
-`;
+`);
 
-// Llenado del bloque negro terminal
 const term = document.getElementById('cardDemostracionTerminal');
-if(listaDemostraciones.length > 0){
-term.innerText = listaDemostraciones.join('\n\n');
-} else {
-term.innerText = "SIN NOVEDADES REGISTRADAS (PERSONAL COMPLETO EN FORMACIÓN)";
+if(term){
+    if(listaDemostraciones.length > 0){
+        term.innerText = listaDemostraciones.join('\n\n');
+    } else {
+        term.innerText = "SIN NOVEDADES REGISTRADAS (PERSONAL COMPLETO EN FORMACIÓN)";
+    }
 }
 }
 
@@ -619,6 +630,7 @@ term.innerText = "SIN NOVEDADES REGISTRADAS (PERSONAL COMPLETO EN FORMACIÓN)";
 function renderizarTablaDinamica(){
 const tbody = document.getElementById('cuerpoTablaDinamica');
 const tfoot = document.getElementById('pieTablaDinamica');
+if(!tbody || !tfoot) return;
 tbody.innerHTML = '';
 
 let lista = [...partes];
@@ -737,11 +749,12 @@ const unidad = decodeURIComponent(unidadEncoded);
 const p = partes.find(x => x.unidad.toLowerCase() === unidad.toLowerCase());
 if(!p) return;
 
-document.getElementById('modalTituloServicio').innerText = p.unidad;
-document.getElementById('modalSubtituloServicio').innerText = `Enviado a las: ${p.horaEnvio} | FH: ${p.fechaMilitar || 'Registrado'}`;
+setTxt('modalTituloServicio', p.unidad);
+setTxt('modalSubtituloServicio', `Enviado a las: ${p.horaEnvio} | FH: ${p.fechaMilitar || 'Registrado'}`);
 
 const noF = (p.efectivo||0) - (p.asisten||0);
 const cuerpo = document.getElementById('modalCuerpoDetalle');
+if(cuerpo){
 cuerpo.innerHTML = `
 <div class="bg-slate-50 border p-2.5 rounded-lg">
 <div class="text-[10px] font-bold text-slate-500 uppercase">RESPONSABLE OFICIAL:</div>
@@ -787,83 +800,82 @@ ${p.demostracion ? p.demostracion : 'Sin demostración nominal.'}
 </div>
 </div>
 `;
+}
 
-document.getElementById('modalDetalleServicio').classList.remove('hidden');
+const modal = document.getElementById('modalDetalleServicio');
+if(modal) modal.classList.remove('hidden');
 }
 
 function cerrarModalDetalle(){
-document.getElementById('modalDetalleServicio').classList.add('hidden');
+const modal = document.getElementById('modalDetalleServicio');
+if(modal) modal.classList.add('hidden');
 }
 
-// ================= GENERADOR DE IMAGEN ESTILO MODAL PARA WHATSAPP =================
-async function generarImagenWhatsAppCard(){
+// ================= GENERADOR DE IMAGEN CON CARGA LIGERA =================
+function cargarLibreriaImagen(callback){
+    if(window.html2canvas){ callback(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = callback;
+    s.onerror = () => alert("Error cargando librería de imagen. Verifique su internet.");
+    document.head.appendChild(s);
+}
+
+function generarImagenWhatsAppCard(){
 if(partes.length===0) return alert('No hay partes registrados para generar la imagen.');
 
-const btn = event.currentTarget;
-const textoOriginal = btn.innerHTML;
-btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generando Imagen HD...';
-btn.disabled = true;
-
-try{
-    const tarjeta = document.getElementById('tarjetaReporteWhatsApp');
-    
-    // Captura exacta con escala 2X para alta definición en WhatsApp
-    const canvas = await html2canvas(tarjeta, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        logging: false
-    });
-
-    canvas.toBlob(async (blob) => {
-        const nombreArchivo = `PARTE_GENERAL_HMC_${obtenerFechaMilitar()}.png`;
-        const file = new File([blob], nombreArchivo, { type: 'image/png' });
-
-        if(navigator.canShare && navigator.canShare({ files: [file] })){
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: 'PARTE GENERAL H.M.C.',
-                    text: `PARTE GENERAL H.M.C. - U.A.P.`
-                });
-                return;
-            } catch (err) {}
-        }
-
-        const enlace = document.createElement('a');
-        enlace.download = nombreArchivo;
-        enlace.href = canvas.toDataURL('image/png');
-        enlace.click();
-        alert('📸 ¡Imagen oficial de PARTE GENERAL H.M.C. generada y descargada! Ya puedes compartirla en WhatsApp.');
-    }, 'image/png');
-
-} catch(err){
-    alert('Error al generar la imagen. Intente nuevamente.');
-} finally{
-    btn.innerHTML = textoOriginal;
-    btn.disabled = false;
+const btn = event?.currentTarget;
+const textoOriginal = btn ? btn.innerHTML : '';
+if(btn){
+    btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generando Imagen HD...';
+    btn.disabled = true;
 }
+
+cargarLibreriaImagen(async () => {
+    try{
+        const tarjeta = document.getElementById('tarjetaReporteWhatsApp');
+        const canvas = await html2canvas(tarjeta, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+
+        canvas.toBlob(async (blob) => {
+            const nombreArchivo = `PARTE_GENERAL_HMC_${obtenerFechaMilitar()}.png`;
+            const file = new File([blob], nombreArchivo, { type: 'image/png' });
+
+            if(navigator.canShare && navigator.canShare({ files: [file] })){
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'PARTE GENERAL H.M.C.',
+                        text: `PARTE GENERAL H.M.C. - U.A.P.`
+                    });
+                    return;
+                } catch (err) {}
+            }
+
+            const enlace = document.createElement('a');
+            enlace.download = nombreArchivo;
+            enlace.href = canvas.toDataURL('image/png');
+            enlace.click();
+            alert('📸 ¡Imagen oficial de PARTE GENERAL H.M.C. descargada con éxito! Ya puedes compartirla en WhatsApp.');
+        }, 'image/png');
+
+    } catch(err){
+        alert('Error al generar imagen.');
+    } finally{
+        if(btn){
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
+        }
+    }
+});
 }
 
 // COPIAR TEXTO FORMATO WHATSAPP (RESPALDO)
 function copiarResumenWhatsApp(){
 if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
 
-let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
-let nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,per:0,sal:0,hosp:0,fal:0,cambio:0,otros:0};
-
-partes.forEach(p=>{
-tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
-nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
-nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
-nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
-});
-
-const noForman = tEf - tAsis;
-
-let msg = `*PARTE GENERAL H.M.C.*\n`;
-msg += `*MINISTERIO DE DEFENSA*\n`;
-msg += `*FH.:* ${obtenerFechaMilitar()}\n\n`;
-
-msg += `*1. EFECTIVO GENERAL:* ${tEf}\n`;
-msg += `• Mil: ${tMil}
+let tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsi
