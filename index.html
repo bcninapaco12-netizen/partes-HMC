@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard Partes HMC COSSMIL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.active-tab{border-bottom:3px solid #1e3a8a;color:#1e3a8a;font-weight:700;background:#f8fafc}
+@media print{header,nav,.no-print{display:none!important}#view-centralizado{display:block!important;padding:0!important}}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+<!-- Encabezado Institucional -->
+<header class="bg-slate-900 text-white shadow-md border-b-4 border-blue-800 p-3">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 bg-blue-800/90 rounded-xl flex items-center justify-center border border-blue-500 shadow-inner">
+<i class="fa-solid fa-shield-halved text-blue-300 text-xl"></i>
+</div>
+<div>
+<h1 class="text-sm font-black uppercase tracking-wider flex items-center gap-2">
+Hospital Militar Central "COSSMIL"
+<span class="bg-blue-700 text-blue-200 text-[9px] px-1.5 py-0.5 rounded font-mono font-bold">U.A.P.</span>
+</h1>
+<p class="text-[11px] text-slate-300 flex items-center gap-1.5 mt-0.5">
+<span id="dotEstado" class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span id="txtEstadoNube" class="font-medium text-emerald-400">Google Firebase: En Línea</span>
+<span class="text-slate-500">•</span>
+<span id="txtUltimaSync" class="text-slate-400 text-[10px]">Iniciando...</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span id="relojVivo" class="text-xs bg-slate-800/90 px-2.5 py-1.5 rounded-lg font-mono text-emerald-400 border border-slate-700 shadow-inner">FH: --</span>
+<button onclick="restablecerNuevoDia()" class="no-print bg-rose-700 hover:bg-rose-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
+<i class="fa-solid fa-rotate-right"></i> Nuevo Día
+</button>
+</div>
+</div>
+</header>
+
+<!-- Navegación por 4 Módulos -->
+<nav class="max-w-7xl mx-auto px-2 mt-2 no-print">
+<div class="flex border-b border-slate-300 bg-white rounded-t-lg shadow-sm overflow-x-auto text-xs">
+<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 mr-1.5"></i> 1. Formulario</button>
+<button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-list-check text-emerald-600 mr-1.5"></i> 2. Cumplimiento (<span id="tabCountCumplidos">0</span>)</button>
+<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-file-contract text-amber-600 mr-1.5"></i> 3. Parte General H.M.C.</button>
+<button onclick="switchTab('tablaResumen')" id="tab-tablaResumen" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-table-cells text-indigo-600 mr-1.5"></i> 4. Tabla Resumen Dinámica</button>
+</div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-2 pb-12 mt-1">
+
+<!-- ================= 1. FORMULARIO DE ENVÍO ================= -->
+<section id="view-registro" class="bg-white rounded-b-lg shadow p-4">
+<div class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white p-3 rounded-lg shadow mb-4 flex flex-wrap justify-between items-center text-xs gap-2 border border-blue-700">
+<span class="font-bold uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-calculator text-amber-400"></i> Balance en Vivo de Fuerza:</span>
+<div class="font-mono text-xs flex gap-1.5 items-center">
+<span class="bg-blue-800/90 px-2 py-0.5 rounded border border-blue-600">Efectivo: <b id="resumenFormulaEf" class="text-emerald-300">0</b></span> -
+<span class="bg-blue-800/90 px-2 py-0.5 rounded border border-blue-600">No Forman: <b id="resumenFormulaNov" class="text-rose-300">0</b></span> =
+<span class="bg-emerald-800 px-2.5 py-0.5 rounded font-black border border-emerald-500 shadow text-white">FORMAN: <b id="resumenFormulaForman" class="text-sm">0</b></span>
+</div>
+</div>
+
+<form id="parteForm" onsubmit="guardarParte(event)" class="space-y-4 text-xs">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div>
+<label class="font-bold text-slate-700 block mb-1 uppercase">SERVICIO / UNIDAD *</label>
+<select id="unidadSelect" required onchange="verificarOtro(this.value)" class="w-full border p-2 rounded-lg bg-slate-50 outline-none focus:ring-2 focus:ring-blue-600">
+<option value="">-- Seleccionar Servicio --</option>
+<option value="Servicio de Imagenología">Servicio de Imagenología</option>
+<option value="Servicio de Nutrición">Servicio de Nutrición</option>
+<option value="Mantenimiento e Infraestructura">Mantenimiento e Infraestructura</option>
+<option value="Sección Almacenes">Sección Almacenes</option>
+<option value="Sección Activos Fijos">Sección Activos Fijos</option>
+<option value="Sección Lavandería">Sección Lavandería</option>
+<option value="Servicio de Patología">Servicio de Patología</option>
+<option value="Vigencia de Derechos">Vigencia de Derechos</option>
+<option value="Casa Adulto Mayor">Casa Adulto Mayor</option>
+<option value="Compañía de Seguridad H.M.C.">Compañía de Seguridad H.M.C.</option>
+<option value="Sección Adquisición y Contrataciones">Sección Adquisición y Contrataciones</option>
+<option value="Unidad Administrativa Financiera">Unidad Administrativa Financiera</option>
+<option value="Citas Médicas">Citas Médicas</option>
+<option value="__OTRO__">➕ OTRO (Escribir manualmente)</option>
+</select>
+<input type="text" id="unidadManual" placeholder="Escriba su Sección o Servicio..." class="hidden mt-2 w-full border border-blue-400 p-2 rounded-lg bg-blue-50">
+</div>
+<div>
+<label class="font-bold text-slate-700 block mb-1 uppercase">GRADO Y NOMBRE DEL RESPONSABLE *</label>
+<input type="text" id="responsable" placeholder="Ej: Sof. 2do. DESA. Edwin Quispe Aruquipa" required class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-600">
+</div>
+</div>
+
+<!-- 1. DESGLOSE FUERZA -->
+<div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+<h3 class="font-bold text-slate-700 uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-users text-blue-700"></i> 1. Desglose de Personal (Suma al Efectivo)</h3>
+<div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
+<div><label class="text-[10px] block font-semibold text-slate-600">Militar</label><input type="number" id="mil" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600">Civil Ítem</label><input type="number" id="itm" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900">P-121</label><input type="number" id="p121" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900">P-251</label><input type="number" id="p251" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900">P-252</label><input type="number" id="p252" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600">Tropa/Seg.</label><input type="number" id="trp" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
+</div>
+<div class="mt-2.5 pt-2 border-t flex justify-between font-bold text-xs">
+<span>EFECTIVO TOTAL REGISTRADO:</span><span id="txtEfectivoTotal" class="text-blue-800 text-sm font-black">0</span>
+</div>
+</div>
+
+<!-- 2. NOVEDADES (RESTAN) -->
+<div class="bg-amber-50/70 p-3.5 rounded-lg border border-amber-200">
+<div class="flex justify-between items-center mb-2.5">
+<h3 class="font-bold text-amber-900 uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-minus text-rose-600"></i> 2. Novedades (Restan automáticamente de Forman)</h3>
+<span class="text-[10px] bg-white px-2 py-0.5 rounded-full border border-amber-300 font-bold shadow-xs">Total No Forman: <b id="txtTotalAusentes" class="text-rose-700">0</b></span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+<div class="bg-emerald-100 p-2 rounded-lg border-2 border-emerald-500 text-center shadow-xs">
+<label class="block font-black text-emerald-950 text-[10px] uppercase">FORMAN / ASISTEN</label>
+<input type="number" id="novAsiste" value="0" readonly class="w-full border rounded p-1 text-center font-black text-emerald-900 bg-white text-sm">
+</div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Baja Médica</label><input type="number" id="novBaja" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Vacación</label><input type="number" id="novVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">P/Cuenta Vacación</label><input type="number" id="novCtaVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Guardia HMC</label><input type="number" id="novGuardia" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">P/Cumpleaños</label><input type="number" id="novCumple" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Comisión / FAB</label><input type="number" id="novComision" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Permiso Especial</label><input type="number" id="novPermiso" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Turno Saliente</label><input type="number" id="novSaliente" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Hospitalizado</label><input type="number" id="novHosp" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Faltando s/ Justif.</label><input type="number" id="novFalta" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 font-medium">Cambio de Destino</label><input type="number" id="novCambio" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+</div>
+
+<!-- OTROS (MANUAL) -->
+<div class="mt-3 pt-2.5 border-t border-amber-300/80 bg-white p-2.5 rounded-lg border">
+<label class="text-[11px] font-bold text-amber-950 uppercase flex items-center gap-1.5 mb-1.5">
+<i class="fa-solid fa-pen-clip text-amber-700"></i> Otras Novedades (Especificación Manual):
+</label>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+<div class="sm:col-span-1">
+<label class="text-[10px] text-slate-600 block mb-0.5">Cantidad (Resta):</label>
+<input type="number" id="novOtros" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-amber-300 rounded-lg p-1.5 text-center font-bold bg-amber-50 text-slate-800">
+</div>
+<div class="sm:col-span-3">
+<label class="text-[10px] text-slate-600 block mb-0.5">Motivo / Concepto (ej. Fallecimiento, Aislamiento, Licencia):</label>
+<input type="text" id="novOtrosDetalle" placeholder="Escriba el motivo de la ausencia..." class="w-full border rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50">
+</div>
+</div>
+</div>
+
+</div>
+
+<div>
+<label class="font-bold text-slate-700 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Organizado por novedad):</label>
+<textarea id="demostracion" rows="4" placeholder="Ej:&#10;VACACION&#10;MY. DIM. JUAN CARLOS LOPEZ ZEBALLOS&#10;&#10;GUARDIA HMC&#10;SOF. INCL. ANGELICA PEREZ CHAMBILLA&#10;&#10;BAJA MEDICA&#10;SOF.1RO.DEPSS. OSCAR FERNANDEZ ACHA" class="w-full border p-2.5 rounded-lg outline-none font-mono text-xs focus:ring-2 focus:ring-blue-600"></textarea>
+</div>
+
+<button type="submit" id="btnEnviar" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-black py-3 rounded-lg shadow-md uppercase tracking-wider transition flex items-center justify-center gap-2">
+<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Parte Oficial a la Nube
+</button>
+</form>
+</section>
+
+<!-- ================= 2. CUMPLIMIENTO ================= -->
+<section id="view-cumplimiento" class="bg-white rounded-b-lg shadow p-4 hidden">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
+<div>
+<h2 class="font-black text-slate-800 uppercase text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-list-check text-emerald-600"></i> Control de Cumplimiento de Servicios</h2>
+<p class="text-[10px] text-slate-500">Monitoreo en tiempo real de recepción de partes</p>
+</div>
+<div class="flex gap-2">
+<button onclick="copiarReporteCumplimiento()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+<i class="fa-brands fa-whatsapp text-sm"></i> Copiar Cumplimiento
+</button>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+<div class="border border-emerald-300 rounded-lg p-3 bg-emerald-50/40">
+<h3 class="font-bold text-emerald-800 uppercase mb-2 flex items-center justify-between">
+<span><i class="fa-solid fa-circle-check text-emerald-600"></i> Partes Recibidos</span>
+<span id="countCumplieron" class="bg-emerald-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
+</h3>
+<div id="listaCumplieron" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
+</div>
+<div class="border border-rose-300 rounded-lg p-3 bg-rose-50/40">
+<h3 class="font-bold text-rose-800 uppercase mb-2 flex items-center justify-between">
+<span><i class="fa-solid fa-clock text-rose-600"></i> Pendientes / Omisos</span>
+<span id="countFaltan" class="bg-rose-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
+</h3>
+<div id="listaFaltan" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
+</div>
+</div>
+</section>
+
+<!-- ================= 3. PARTE GENERAL (TARJETA MODAL PARA IMAGEN) ================= -->
+<section id="view-centralizado" class="bg-white rounded-b-lg shadow p-4 hidden">
+
+<div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b pb-3 mb-4">
+<div>
+<h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-file-contract text-blue-700"></i> PARTE GENERAL H.M.C.
+</h2>
+<p class="text-[10px] text-slate-500">Reporte oficial consolidado en imagen HD para WhatsApp</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<button onclick="generarImagenWhatsAppCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
+<i class="fa-solid fa-image text-emerald-200"></i> Descargar Imagen WhatsApp
+</button>
+<button onclick="copiarResumenWhatsApp()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-regular fa-copy text-slate-300"></i> Copiar Texto
+</button>
+<button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-solid fa-print text-sm"></i> Imprimir / PDF
+</button>
+<button onclick="restablecerNuevoDia()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-solid fa-rotate-right text-sm"></i> Nuevo Día
+</button>
+</div>
+</div>
+
+<!-- ================= TARJETA OFICIAL ESTILO MODAL ================= -->
+<div id="tarjetaReporteWhatsApp" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden text-xs">
+  
+  <div class="bg-slate-900 text-white p-4 border-b border-slate-800">
+    <div class="flex justify-between items-start">
+      <div>
+        <h2 class="font-black text-base uppercase tracking-wider text-white">
+          PARTE GENERAL H.M.C.
+        </h2>
+        <p class="text-[11px] text-slate-300 font-mono mt-0.5" id="cardReporteFH">
+          FH: --
+        </p>
+      </div>
+      <span class="bg-blue-800 text-blue-200 border border-blue-600 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+        U.A.P.
+      </span>
+    </div>
+  </div>
+
+  <div class="p-4 space-y-3.5 bg-white">
+    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl shadow-xs">
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">RESPONSABLE OFICIAL:</div>
+      <div class="text-xs font-black text-slate-900 mt-0.5 tracking-wide">
+        JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL
+      </div>
+    </div>
+
+    <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">EFECTIVO DESGLOSADO:</div>
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Mil: <span id="cardMil" class="text-slate-900">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Ítem: <span id="cardItm" class="text-slate-900">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-121: <span id="cardP121">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-251: <span id="cardP251">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-252: <span id="cardP252">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Trp: <span id="cardTrp" class="text-slate-900">0</span></div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-slate-200 flex justify-between items-center text-xs font-bold">
+        <span>Total Efectivo: <b id="cardTotalEf" class="text-slate-900 text-sm">0</b></span>
+        <span class="text-emerald-700">Forman: <b id="cardTotalForman" class="text-sm">0</b></span>
+        <span class="text-rose-700">No Forman: <b id="cardTotalNoForman" class="text-sm">0</b></span>
+      </div>
+    </div>
+
+    <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">NOVEDADES NUMÉRICAS:</div>
+      <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-700 font-medium" id="cardListaNovedades"></div>
+    </div>
+
+    <div>
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-1.5">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
+      <div id="cardDemostracionTerminal" class="bg-slate-950 text-slate-100 p-3.5 rounded-xl font-mono text-[11px] leading-relaxed whitespace-pre-line shadow-inner max-h-64 overflow-y-auto border border-slate-800">
+        Sin novedades registradas.
+      </div>
+    </div>
+
+    <div class="pt-2 text-center border-t border-slate-200">
+      <div class="text-[10px] font-black uppercase text-slate-800">MINISTERIO DE DEFENSA</div>
+      <div class="text-[9px] text-slate-500 font-semibold">Hospital Militar Central "COSSMIL"</div>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<!-- ================= 4. TABLA DINÁMICA RESUMEN ================= -->
+<section id="view-tablaResumen" class="bg-white rounded-b-lg shadow p-4 hidden">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
+<div>
+<h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-table-cells text-indigo-700"></i> Matriz Dinámica Resumen de Unidades
+</h2>
+<p class="text-[10px] text-slate-500">Supervisión comparativa e inspección de comprobantes</p>
+</div>
+<div class="flex items-center gap-2">
+<select id="filtroRapidoUnidad" onchange="filtrarTablaPorSelect(this.value)" class="border rounded-lg p-1.5 text-xs bg-slate-50 outline-none">
+<option value="">-- Ver todas las unidades --</option>
+</select>
+</div>
+</div>
+
+<div class="overflow-x-auto my-2 border border-slate-200 rounded-lg shadow-xs">
+<table class="w-full border-collapse text-left text-xs">
+<thead>
+<tr class="bg-slate-900 text-white text-[10px] uppercase font-bold select-none cursor-pointer">
+<th onclick="ordenarTabla('unidad')" class="p-2 border-b border-slate-700 hover:bg-slate-800">Unidad / Servicio ⬍</th>
+<th onclick="ordenarTabla('efectivo')" class="p-2 border-b border-slate-700 text-center hover:bg-slate-800">Ef ⬍</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Mil</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Ítem</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-121</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-251</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-252</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Trp</th>
+<th onclick="ordenarTabla('asisten')" class="p-2 border-b border-slate-700 text-center bg-emerald-900 hover:bg-emerald-800">Forman ⬍</th>
+<th onclick="ordenarTabla('noForman')" class="p-2 border-b border-slate-700 text-center bg-rose-950 hover:bg-rose-900">No Forman ⬍</th>
+<th onclick="ordenarTabla('asistenciaPct')" class="p-2 border-b border-slate-700 text-center hover:bg-slate-800">% Asist ⬍</th>
+<th class="p-2 border-b border-slate-700 text-center">Acción</th>
+</tr>
+</thead>
+<tbody id="cuerpoTablaDinamica" class="divide-y divide-slate-200 text-[11px]"></tbody>
+<tfoot id="pieTablaDinamica" class="bg-slate-100 font-black text-[11px] border-t-2 border-slate-400"></tfoot>
+</table>
+</div>
+</section>
+
+</main>
+
+<!-- ================= MODAL DETALLE DE CÓMO ENVIÓ LA UNIDAD ================= -->
+<div id="modalDetalleServicio" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
+<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-300">
+<div class="bg-slate-900 text-white p-3.5 rounded-t-2xl flex justify-between items-center">
+<div>
+<h3 id="modalTituloServicio" class="font-black text-sm uppercase">Detalle del Servicio</h3>
+<p id="modalSubtituloServicio" class="text-[10px] text-slate-300">Comprobante de recepción en la nube</p>
+</div>
+<button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-0.5"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div id="modalCuerpoDetalle" class="p-4 space-y-3 text-xs"></div>
+<div class="bg-slate-50 p-3 rounded-b-2xl border-t text-right">
+<button onclick="cerrarModalDetalle()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Cerrar</button>
+</div>
+</div>
+</div>
+
+<script>
+// BASE DE DATOS FIREBASE DE GOOGLE (PROBADA Y OPERATIVA)
+var URL_FIREBASE = "https://partes-hmc-default-rtdb.firebaseio.com/partes_dia";
+
+var SERVICIOS_OFICIALES=[
+"Servicio de Imagenología","Servicio de Nutrición","Mantenimiento e Infraestructura",
+"Sección Almacenes","Sección Activos Fijos","Sección Lavandería","Servicio de Patología",
+"Vigencia de Derechos","Casa Adulto Mayor","Compañía de Seguridad H.M.C.",
+"Sección Adquisición y Contrataciones","Unidad Administrativa Financiera","Citas Médicas"
+];
+
+var partes=[];
+var ordenActualColumna = '';
+var ordenAscendente = true;
+
+function setTxt(id, val){ var el = document.getElementById(id); if(el) el.innerText = val; }
+function setHtml(id, val){ var el = document.getElementById(id); if(el) el.innerHTML = val; }
+
+function obtenerFechaMilitar(d){
+if(!d) d = new Date();
+var dia=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),m=String(d.getMinutes()).padStart(2,'0');
+var meses=["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+return `${dia}${h}${m}-${meses[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`;
+}
+
+function actualizarReloj(){
+var ahora = new Date();
+var str = `FH: ${obtenerFechaMilitar(ahora)} (${ahora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})})`;
+setTxt('relojVivo', str);
+}
+actualizarReloj();
+setInterval(actualizarReloj, 1000);
+
+async function cargarPartesDeLaNube(){
+    try{
+        var res = await fetch(`${URL_FIREBASE}.json`);
+        if(res.ok){
+            var data = await res.json();
+            partes = data ? Object.values(data) : [];
+            var ahora = new Date();
+            setTxt('txtUltimaSync', `Sinc: ${ahora.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+            setTxt('txtEstadoNube', `Google Firebase: En Línea (${partes.length} recibidos)`);
+            var dot = document.getElementById('dotEstado');
+            if(dot) dot.className = "inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            renderizarCumplimiento();
+            renderizarCentralizado();
+            renderizarTablaDinamica();
+            actualizarSelectUnidades();
+        }
+    }catch(err){
+        setTxt('txtEstadoNube', "Reintentando sincronización...");
+        var dot = document.getElementById('dotEstado');
+        if(dot) dot.className = "inline-block w-2 h-2 rounded-full bg-amber-400";
+    }
+}
+setInterval(cargarPartesDeLaNube, 6000);
+
+function switchTab(t){
+['registro','cumplimiento','centralizado','tablaResumen'].forEach(v=>{
+var sec = document.getElementById(`view-${v}`);
+if(sec) sec.classList.toggle('hidden', v!==t);
+var b=document.getElementById(`tab-${v}`);
+if(b) b.className=v===t?'px-4 py-2.5 active-tab whitespace-nowrap':'px-4 py-2.5 text-slate-600 whitespace-nowrap';
+});
+if(t==='cumplimiento') renderizarCumplimiento();
+if(t==='centralizado') renderizarCentralizado();
+if(t==='tablaResumen') renderizarTablaDinamica();
+}
+
+function verificarOtro(v){
+var m=document.getElementById('unidadManual');
+if(!m) return;
+if(v==='__OTRO__'){m.classList.remove('hidden');m.required=true;m.focus()}
+else{m.classList.add('hidden');m.required=false}
+}
+
+function n(id){var e=document.getElementById(id);if(!e)return 0;var v=parseInt(e.value,10);return isNaN(v)?0:v}
+
+function recalcularTodo(){
+var ef=n('mil')+n('itm')+n('p121')+n('p251')+n('p252')+n('trp');
+var aus=n('novBaja')+n('novVacacion')+n('novCtaVacacion')+n('novGuardia')+n('novCumple')+n('novComision')+n('novPermiso')+n('novSaliente')+n('novHosp')+n('novFalta')+n('novCambio')+n('novOtros');
+var forman=Math.max(0,ef-aus);
+
+setTxt('txtEfectivoTotal', ef);
+setTxt('txtTotalAusentes', aus);
+setTxt('resumenFormulaEf', ef);
+setTxt('resumenFormulaNov', aus);
+setTxt('resumenFormulaForman', forman);
+var asis=document.getElementById('novAsiste');
+if(asis) asis.value=forman;
+}
+
+function initApp(){
+    actualizarReloj();
+    document.querySelectorAll('.calc-efectivo,.calc-novedad').forEach(i=>{
+        i.addEventListener('input',recalcularTodo);
+        i.addEventListener('change',recalcularTodo);
+    });
+    recalcularTodo();
+    cargarPartesDeLaNube();
+}
+if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+
+async function guardarParte(e){
+e.preventDefault();
+
+var sel=document.getElementById('unidadSelect').value;
+var u=sel==='__OTRO__'?document.getElementById('unidadManual').value.trim():sel;
+if(!u){alert('Seleccione o escriba su servicio.');return}
+
+var totalEf=n('mil')+n('itm')+n('p121')+n('p251')+n('p252')+n('trp');
+var ahora=new Date();
+var h=ahora.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+var nuevo={
+id:Date.now(),fechaMilitar:obtenerFechaMilitar(ahora),horaEnvio:h,unidad:u,responsable:document.getElementById('responsable').value.trim(),
+mil:n('mil'),itm:n('itm'),p121:n('p121'),p251:n('p251'),p252:n('p252'),trp:n('trp'),efectivo:totalEf,asisten:n('novAsiste'),
+baja:n('novBaja'),vacacion:n('novVacacion'),ctaVacacion:n('novCtaVacacion'),guardiaHmc:n('novGuardia'),cumpleanos:n('novCumple'),
+comision:n('novComision'),permiso:n('novPermiso'),saliente:n('novSaliente'),hospitalizado:n('novHosp'),falta:n('novFalta'),cambioDestino:n('novCambio'),
+otrosCantidad:n('novOtros'),otrosDetalle:document.getElementById('novOtrosDetalle').value.trim(),
+demostracion:document.getElementById('demostracion').value.trim()
+};
+
+var btn=document.getElementById('btnEnviar');
+btn.innerText="Enviando a Google Firebase...";
+btn.disabled=true;
+
+try{
+    var clave = encodeURIComponent(u.toLowerCase().replace(/[.#$\[\]]/g, '_'));
+    await fetch(`${URL_FIREBASE}/${clave}.json`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(nuevo)
+    });
+
+    alert(`✅ ¡Parte de ${u} guardado y sincronizado con éxito!`);
+    document.getElementById('parteForm').reset();
+    document.getElementById('unidadManual').classList.add('hidden');
+    recalcularTodo();
+    await cargarPartesDeLaNube();
+    switchTab('centralizado');
+}catch(err){
+    alert("Error de conexión. Intente nuevamente.");
+}finally{
+    btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Parte Oficial a la Nube';
+    btn.disabled=false;
+}
+}
+
+async function restablecerNuevoDia(){
+if(confirm("⚠️ ¿INICIAR NUEVA JORNADA EN LA NUBE?\nSe borrarán los partes de todos los teléfonos para iniciar el día en blanco.")){
+try{
+    await fetch(`${URL_FIREBASE}.json`, { method: 'DELETE' });
+    partes=[];
+    renderizarCumplimiento();
+    renderizarCentralizado();
+    renderizarTablaDinamica();
+    recalcularTodo();
+    alert("🔄 Pizarra restablecida a cero en todos los teléfonos.");
+    switchTab('registro');
+}catch(err){
+    alert("Error al restablecer en Firebase.");
+}
+}
+}
+
+function renderizarCumplimiento(){
+var c=document.getElementById('listaCumplieron'),f=document.getElementById('listaFaltan');
+if(!c || !f) return;
+c.innerHTML='';f.innerHTML='';
+var env=partes.map(p=>p.unidad.toLowerCase());
+var ok=0,pend=0;
+
+partes.forEach(p=>{
+ok++;
+var d=document.createElement('div');
+d.className='bg-white p-2.5 rounded-lg border border-emerald-200 shadow-sm flex justify-between items-center';
+d.innerHTML=`<div><div class="font-bold text-slate-800">${p.unidad}</div><div class="text-[10px] text-slate-500">${p.responsable}</div></div><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]"><i class="fa-regular fa-clock"></i> ${p.horaEnvio}</span>`;
+c.appendChild(d);
+});
+
+SERVICIOS_OFICIALES.forEach(s=>{
+if(!env.includes(s.toLowerCase())){
+pend++;
+var d=document.createElement('div');
+d.className='bg-white p-2.5 rounded-lg border border-rose-200 shadow-sm flex justify-between items-center';
+d.innerHTML=`<span class="text-rose-900 font-semibold">${s}</span><span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded text-[10px]">PENDIENTE</span>`;
+f.appendChild(d);
+}
+});
+setTxt('countCumplieron', ok);
+setTxt('countFaltan', pend);
+setTxt('tabCountCumplidos', `${ok}/${ok+pend}`);
+}
+
+function copiarReporteCumplimiento(){
+var ahora=new Date();
+var env=partes.map(p=>p.unidad.toLowerCase());
+var omisos=SERVICIOS_OFICIALES.filter(s=>!env.includes(s.toLowerCase()));
+
+var msg=`*CONTROL DE CUMPLIMIENTO DE PARTES - HMC*\n*FH.:* ${obtenerFechaMilitar(ahora)}\n\n`;
+msg+=`✅ *ENVIARON (${partes.length}):*\n`;
+partes.forEach((p,i)=>msg+=`${i+1}. *${p.unidad}* (${p.horaEnvio}) - ${p.responsable}\n`);
+msg+=`\n⚠️ *OMISOS / PENDIENTES (${omisos.length}):*\n`;
+omisos.forEach((s,i)=>msg+=`${i+1}. *${s}* 🔴 (PENDIENTE)\n`);
+
+navigator.clipboard.writeText(msg).then(()=>alert('📋 Reporte de cumplimiento copiado para WhatsApp.'));
+}
+
+function renderizarCentralizado(){
+var fhActual = obtenerFechaMilitar();
+var horaActual = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+setTxt('cardReporteFH', `Enviado a las: ${horaActual} | FH: ${fhActual}`);
+
+var tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
+var nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
+var listaDemostraciones = [];
+
+partes.forEach(p => {
+tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
+nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
+nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
+nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
+
+if(p.demostracion && p.demostracion.trim().length > 0){
+listaDemostraciones.push(p.demostracion.trim());
+}
+});
+
+var totalNoForman = tEf - tAsis;
+
+setTxt('cardMil', tMil);
+setTxt('cardItm', tItm);
+setTxt('cardP121', tP121);
+setTxt('cardP251', tP251);
+setTxt('cardP252', tP252);
+setTxt('cardTrp', tTrp);
+
+setTxt('cardTotalEf', tEf);
+setTxt('cardTotalForman', tAsis);
+setTxt('cardTotalNoForman', totalNoForman);
+
+setHtml('cardListaNovedades', `
+<div class="flex justify-between"><span>Baja:</span><b>${nov.baja}</b></div>
+<div class="flex justify-between"><span>Vacación:</span><b>${nov.vac}</b></div>
+<div class="flex justify-between"><span>P/Cta:</span><b>${nov.cta}</b></div>
+<div class="flex justify-between"><span>Guardia HMC:</span><b>${nov.guardia}</b></div>
+<div class="flex justify-between"><span>Cumpleaños:</span><b>${nov.cumple}</b></div>
+<div class="flex justify-between"><span>Comisión:</span><b>${nov.com}</b></div>
+<div class="flex justify-between"><span>Saliente:</span><b>${nov.sal}</b></div>
+<div class="flex justify-between"><span>Hospitalizado:</span><b>${nov.hosp}</b></div>
+<div class="flex justify-between"><span>Falta:</span><b>${nov.fal}</b></div>
+<div class="flex justify-between"><span>Otros:</span><b>${nov.otros}</b></div>
+`);
+
+var term = document.getElementById('cardDemostracionTerminal');
+if(term){
+    if(listaDemostraciones.length > 0){
+        term.innerText = listaDemostraciones.join('\n\n');
+    } else {
+        term.innerText = "SIN NOVEDADES REGISTRADAS (PERSONAL COMPLETO EN FORMACIÓN)";
+    }
+}
+}
+
+function renderizarTablaDinamica(){
+var tbody = document.getElementById('cuerpoTablaDinamica');
+var tfoot = document.getElementById('pieTablaDinamica');
+if(!tbody || !tfoot) return;
+tbody.innerHTML = '';
+
+var lista = [...partes];
+
+if(ordenActualColumna){
+lista.sort((a,b)=>{
+var vA = a[ordenActualColumna];
+var vB = b[ordenActualColumna];
+if(ordenActualColumna === 'noForman'){
+vA = (a.efectivo||0) - (a.asisten||0);
+vB = (b.efectivo||0) - (b.asisten||0);
+}
+if(ordenActualColumna === 'asistenciaPct'){
+vA = a.efectivo > 0 ? (a.asisten / a.efectivo) : 0;
+vB = b.efectivo > 0 ? (b.asisten / b.efectivo) : 0;
+}
+if(typeof vA === 'string'){
+return ordenAscendente ? vA.localeCompare(vB) : vB.localeCompare(vA);
+}
+return ordenAscendente ? (vA - vB) : (vB - vA);
+});
+}
+
+var totEf=0,totMil=0,totItm=0,totP121=0,totP251=0,totP252=0,totTrp=0,totAsis=0,totNoF=0;
+
+if(lista.length === 0){
+tbody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-slate-400">No hay partes registrados para mostrar en la matriz.</td></tr>`;
+}
+
+lista.forEach(p => {
+var noF = (p.efectivo||0) - (p.asisten||0);
+var pct = p.efectivo > 0 ? Math.round((p.asisten / p.efectivo) * 100) : 0;
+
+totEf += p.efectivo; totMil += p.mil; totItm += p.itm; totP121 += p.p121;
+totP251 += p.p251; totP252 += p.p252; totTrp += p.trp; totAsis += p.asisten; totNoF += noF;
+
+var tr = document.createElement('tr');
+tr.className = 'hover:bg-slate-50 transition border-b border-slate-200';
+tr.innerHTML = `
+<td class="p-2 font-bold text-slate-800">
+<div>${p.unidad}</div>
+<div class="text-[9px] text-slate-400 font-normal"><i class="fa-regular fa-clock"></i> ${p.horaEnvio} | ${p.responsable}</div>
+</td>
+<td class="p-2 text-center font-bold text-blue-900">${p.efectivo}</td>
+<td class="p-2 text-center text-slate-600">${p.mil}</td>
+<td class="p-2 text-center text-slate-600">${p.itm}</td>
+<td class="p-2 text-center text-blue-800">${p.p121||0}</td>
+<td class="p-2 text-center text-blue-800">${p.p251||0}</td>
+<td class="p-2 text-center text-blue-800">${p.p252||0}</td>
+<td class="p-2 text-center text-slate-600">${p.trp}</td>
+<td class="p-2 text-center font-bold text-emerald-700 bg-emerald-50/50">${p.asisten}</td>
+<td class="p-2 text-center font-bold ${noF>0?'text-rose-700 bg-rose-50/50':'text-slate-400'}">${noF}</td>
+<td class="p-2 text-center">
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${pct>=90?'bg-emerald-100 text-emerald-800':(pct>=75?'bg-amber-100 text-amber-800':'bg-rose-100 text-rose-800')}">${pct}%</span>
+</td>
+<td class="p-2 text-center">
+<button onclick="verDetalleEnvio('${encodeURIComponent(p.unidad)}')" class="bg-blue-800 hover:bg-blue-900 text-white px-2 py-1 rounded text-[10px] font-bold shadow-xs transition">
+<i class="fa-solid fa-receipt"></i> Detalle
+</button>
+</td>
+`;
+tbody.appendChild(tr);
+});
+
+var totPct = totEf > 0 ? Math.round((totAsis / totEf) * 100) : 0;
+tfoot.innerHTML = `
+<tr>
+<td class="p-2 uppercase text-slate-800">TOTAL GENERAL:</td>
+<td class="p-2 text-center text-blue-900">${totEf}</td>
+<td class="p-2 text-center">${totMil}</td>
+<td class="p-2 text-center">${totItm}</td>
+<td class="p-2 text-center">${totP121}</td>
+<td class="p-2 text-center">${totP251}</td>
+<td class="p-2 text-center">${totP252}</td>
+<td class="p-2 text-center">${totTrp}</td>
+<td class="p-2 text-center text-emerald-800">${totAsis}</td>
+<td class="p-2 text-center text-rose-800">${totNoF}</td>
+<td class="p-2 text-center text-blue-900">${totPct}%</td>
+<td class="p-2 text-center text-slate-500 font-normal">--</td>
+</tr>
+`;
+}
+
+function ordenarTabla(col){
+if(ordenActualColumna === col){
+ordenAscendente = !ordenAscendente;
+} else {
+ordenActualColumna = col;
+ordenAscendente = true;
+}
+renderizarTablaDinamica();
+}
+
+function actualizarSelectUnidades(){
+var sel = document.getElementById('filtroRapidoUnidad');
+if(!sel) return;
+var valActual = sel.value;
+sel.innerHTML = `<option value="">-- Ver todas las unidades (${partes.length}) --</option>`;
+partes.forEach(p => {
+sel.innerHTML += `<option value="${p.unidad}">${p.unidad}</option>`;
+});
+sel.value = valActual;
+}
+
+function filtrarTablaPorSelect(unidad){
+if(!unidad){
+renderizarTablaDinamica();
+return;
+}
+verDetalleEnvio(encodeURIComponent(unidad));
+}
+
+function verDetalleEnvio(unidadEncoded){
+var unidad = decodeURIComponent(unidadEncoded);
+var p = partes.find(x => x.unidad.toLowerCase() === unidad.toLowerCase());
+if(!p) return;
+
+setTxt('modalTituloServicio', p.unidad);
+setTxt('modalSubtituloServicio', `Enviado a las: ${p.horaEnvio} | FH: ${p.fechaMilitar || 'Registrado'}`);
+
+var noF = (p.efectivo||0) - (p.asisten||0);
+var cuerpo = document.getElementById('modalCuerpoDetalle');
+if(cuerpo){
+cuerpo.innerHTML = `
+<div class="bg-slate-50 border p-2.5 rounded-lg">
+<div class="text-[10px] font-bold text-slate-500 uppercase">RESPONSABLE OFICIAL:</div>
+<div class="text-xs font-black text-slate-900">${p.responsable}</div>
+</div>
+
+<div class="border rounded-lg p-2.5 bg-blue-50/50">
+<div class="text-[10px] font-bold uppercase text-blue-900 mb-1">EFECTIVO DESGLOSADO:</div>
+<div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
+<div class="bg-white p-1 rounded border">Mil: <b>${p.mil}</b></div>
+<div class="bg-white p-1 rounded border">Ítem: <b>${p.itm}</b></div>
+<div class="bg-white p-1 rounded border text-blue-800">P-121: <b>${p.p121||0}</b></div>
+<div class="bg-white p-1 rounded border text-blue-800">P-251: <b>${p.p251||0}</b></div>
+<div class="bg-white p-1 rounded border text-blue-800">P-252: <b>${p.p252||0}</b></div>
+<div class="bg-white p-1 rounded border">Trp: <b>${p.trp}</b></div>
+</div>
+<div class="mt-2 pt-1 border-t flex justify-between font-bold text-xs">
+<span>Total Efectivo: <b class="text-blue-900">${p.efectivo}</b></span>
+<span class="text-emerald-700">Forman: <b>${p.asisten}</b></span>
+<span class="${noF>0?'text-rose-700':'text-slate-500'}">No Forman: <b>${noF}</b></span>
+</div>
+</div>
+
+<div class="border rounded-lg p-2.5 bg-amber-50/40">
+<div class="text-[10px] font-bold uppercase text-amber-900 mb-1">NOVEDADES NUMÉRICAS:</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
+<div>Baja: <b>${p.baja||0}</b></div>
+<div>Vacación: <b>${p.vacacion||0}</b></div>
+<div>P/Cta: <b>${p.ctaVacacion||0}</b></div>
+<div>Guardia: <b>${p.guardiaHmc||0}</b></div>
+<div>Cumpleaños: <b>${p.cumpleanos||0}</b></div>
+<div>Comisión: <b>${p.comision||0}</b></div>
+<div>Saliente: <b>${p.saliente||0}</b></div>
+<div>Hospitalizado: <b>${p.hospitalizado||0}</b></div>
+</div>
+${p.otrosCantidad > 0 ? `<div class="mt-1 pt-1 border-t text-[10px] text-amber-900 font-semibold">Otros (${p.otrosCantidad}): ${p.otrosDetalle || 'Sin detalle'}</div>` : ''}
+</div>
+
+<div>
+<div class="text-[10px] font-bold uppercase text-slate-700 mb-1">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
+<div class="bg-slate-900 text-slate-100 p-2.5 rounded-lg font-mono text-[10px] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
+${p.demostracion ? p.demostracion : 'Sin demostración nominal.'}
+</div>
+</div>
+`;
+}
+
+var modal = document.getElementById('modalDetalleServicio');
+if(modal) modal.classList.remove('hidden');
+}
+
+function cerrarModalDetalle(){
+var modal = document.getElementById('modalDetalleServicio');
+if(modal) modal.classList.add('hidden');
+}
+
+function cargarLibreriaImagen(callback){
+    if(window.html2canvas){ callback(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = callback;
+    s.onerror = () => alert("Error cargando librería de imagen. Verifique su internet.");
+    document.head.appendChild(s);
+}
+
+function generarImagenWhatsAppCard(){
+if(partes.length===0) return alert('No hay partes registrados para generar la imagen.');
+
+var btn = event ? (event.currentTarget || event.target) : null;
+var textoOriginal = btn ? btn.innerHTML : '';
+if(btn){
+    btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generando Imagen HD...';
+    btn.disabled = true;
+}
+
+cargarLibreriaImagen(async () => {
+    try{
+        var tarjeta = document.getElementById('tarjetaReporteWhatsApp');
+        var canvas = await html2canvas(tarjeta, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+
+        canvas.toBlob(async (blob) => {
+            var nombreArchivo = `PARTE_GENERAL_HMC_${obtenerFechaMilitar()}.png`;
+            var file = new File([blob], nombreArchivo, { type: 'image/png' });
+
+            if(navigator.canShare && navigator.canShare({ files: [file] })){
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'PARTE GENERAL H.M.C.',
+                        text: `PARTE GENERAL H.M.C. - U.A.P.`
+                    });
+                    return;
+                } catch (err) {}
+            }
+
+            var enlace = document.createElement('a');
+            enlace.download = nombreArchivo;
+            enlace.href = canvas.toDataURL('image/png');
+            enlace.click();
+            alert('📸 ¡Imagen oficial de PARTE GENERAL H.M.C. descargada con éxito!');
+        }, 'image/png');
+
+    } catch(err){
+        alert('Error al generar imagen.');
+    } finally{
+        if(btn){
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
+        }
+    }
+});
+}
+
+function copiarResumenWhatsApp(){
+if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
+
+var tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
+var nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
+
+partes.forEach(p=>{
+tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
+nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
+nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
+nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
+});
+
+var noForman = tEf - tAsis;
+
+var msg = `*PARTE GENERAL H.M.C.*\n`;
+msg += `*MINISTERIO DE DEFENSA*\n`;
+msg += `*FH.:* ${obtenerFechaMilitar()}\n\n`;
+
+msg += `*1. EFECTIVO GENERAL:* ${tEf}\n`;
+msg += `• Mil: ${tMil} | Ítem: ${tItm} | P-121: ${tP121}\n`;
+msg += `• P-251: ${tP251} | P-252: ${tP252} | Tropa: ${tTrp}\n`;
+msg += `🟢 *FORMAN / ASISTEN:* ${tAsis}\n`;
+msg += `🔴 *NO FORMAN:* ${noForman}\n\n`;
+
+msg += `*2. NOVEDADES REGISTRADAS*\n`;
+msg += `• Baja: ${nov.baja} | Vacación: ${nov.vac}\n• P/Cta: ${nov.cta} | Guardia: ${nov.guardia}\n• Comisión: ${nov.com} | Otros: ${nov.otros}\n\n`;
+
+msg += `*DEMOSTRACIÓN NOMINAL:*\n`;
+partes.forEach(p=>{
+if(p.demostracion) msg += `\n*${p.unidad.toUpperCase()}*\n${p.demostracion}\n`;
+});
+
+msg += `\n*ATTE.*\n*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\nHospital Militar Central "COSSMIL"`;
+
+navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Texto copiado al portapapeles!'));
+}
+</script>
+</body>
+</html>
