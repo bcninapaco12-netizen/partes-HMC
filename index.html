@@ -1,19 +1,25 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="transition-colors duration-200">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dashboard Partes HMC COSSMIL</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class'
+  }
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 .active-tab{border-bottom:3px solid #1e3a8a;color:#1e3a8a;font-weight:700;background:#f8fafc}
+.dark .active-tab{border-bottom:3px solid #3b82f6;color:#60a5fa;font-weight:700;background:#0f172a}
 @media print{header,nav,.no-print{display:none!important}#view-centralizado{display:block!important;padding:0!important}}
 </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen transition-colors duration-200">
 
 <!-- Encabezado Institucional -->
-<header class="bg-slate-900 text-white shadow-md border-b-4 border-blue-800 p-3">
+<header class="bg-slate-900 dark:bg-slate-950 text-white shadow-md border-b-4 border-blue-800 p-3">
 <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
 <div class="flex items-center gap-2.5">
 <div class="w-10 h-10 bg-blue-800/90 rounded-xl flex items-center justify-center border border-blue-500 shadow-inner">
@@ -33,6 +39,10 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 <div class="flex items-center gap-2">
+<!-- BOTÓN MODO OSCURO / MODO CLARO -->
+<button onclick="toggleModoOscuro()" id="btnModoOscuro" title="Cambiar tema visual" class="no-print bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 px-2.5 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i id="iconoModoOscuro" class="fa-solid fa-moon"></i> <span id="txtModoOscuro" class="hidden sm:inline">Modo Oscuro</span>
+</button>
 <span id="relojVivo" class="text-xs bg-slate-800/90 px-2.5 py-1.5 rounded-lg font-mono text-emerald-400 border border-slate-700 shadow-inner">FH: --</span>
 <button onclick="restablecerNuevoDia()" class="no-print bg-rose-700 hover:bg-rose-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center gap-1.5">
 <i class="fa-solid fa-rotate-right"></i> Nuevo Día
@@ -43,18 +53,18 @@ Hospital Militar Central "COSSMIL"
 
 <!-- Navegación por 4 Módulos -->
 <nav class="max-w-7xl mx-auto px-2 mt-2 no-print">
-<div class="flex border-b border-slate-300 bg-white rounded-t-lg shadow-sm overflow-x-auto text-xs">
-<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 mr-1.5"></i> 1. Formulario</button>
-<button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-list-check text-emerald-600 mr-1.5"></i> 2. Cumplimiento (<span id="tabCountCumplidos">0</span>)</button>
-<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-file-contract text-amber-600 mr-1.5"></i> 3. Parte General H.M.C.</button>
-<button onclick="switchTab('tablaResumen')" id="tab-tablaResumen" class="px-4 py-2.5 text-slate-600 whitespace-nowrap"><i class="fa-solid fa-table-cells text-indigo-600 mr-1.5"></i> 4. Tabla Resumen Dinámica</button>
+<div class="flex border-b border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-t-lg shadow-sm overflow-x-auto text-xs">
+<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 dark:text-blue-400 mr-1.5"></i> 1. Formulario</button>
+<button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap"><i class="fa-solid fa-list-check text-emerald-600 dark:text-emerald-400 mr-1.5"></i> 2. Cumplimiento (<span id="tabCountCumplidos">0</span>)</button>
+<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap"><i class="fa-solid fa-file-contract text-amber-600 dark:text-amber-400 mr-1.5"></i> 3. Parte General H.M.C.</button>
+<button onclick="switchTab('tablaResumen')" id="tab-tablaResumen" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap"><i class="fa-solid fa-table-cells text-indigo-600 dark:text-indigo-400 mr-1.5"></i> 4. Tabla Resumen Dinámica</button>
 </div>
 </nav>
 
 <main class="max-w-7xl mx-auto px-2 pb-12 mt-1">
 
 <!-- ================= 1. FORMULARIO DE ENVÍO ================= -->
-<section id="view-registro" class="bg-white rounded-b-lg shadow p-4">
+<section id="view-registro" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 border border-slate-200 dark:border-slate-800">
 <div class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white p-3 rounded-lg shadow mb-4 flex flex-wrap justify-between items-center text-xs gap-2 border border-blue-700">
 <span class="font-bold uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-calculator text-amber-400"></i> Balance en Vivo de Fuerza:</span>
 <div class="font-mono text-xs flex gap-1.5 items-center">
@@ -67,8 +77,8 @@ Hospital Militar Central "COSSMIL"
 <form id="parteForm" onsubmit="guardarParte(event)" class="space-y-4 text-xs">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 <div>
-<label class="font-bold text-slate-700 block mb-1 uppercase">SERVICIO / UNIDAD *</label>
-<select id="unidadSelect" required onchange="verificarOtro(this.value)" class="w-full border p-2 rounded-lg bg-slate-50 outline-none focus:ring-2 focus:ring-blue-600">
+<label class="font-bold text-slate-700 dark:text-slate-300 block mb-1 uppercase">SERVICIO / UNIDAD *</label>
+<select id="unidadSelect" required onchange="verificarOtro(this.value)" class="w-full border border-slate-300 dark:border-slate-700 p-2 rounded-lg bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-600">
 <option value="">-- Seleccionar Servicio --</option>
 <option value="Servicio de Imagenología">Servicio de Imagenología</option>
 <option value="Servicio de Nutrición">Servicio de Nutrición</option>
@@ -85,67 +95,67 @@ Hospital Militar Central "COSSMIL"
 <option value="Citas Médicas">Citas Médicas</option>
 <option value="__OTRO__">➕ OTRO (Escribir manualmente)</option>
 </select>
-<input type="text" id="unidadManual" placeholder="Escriba su Sección o Servicio..." class="hidden mt-2 w-full border border-blue-400 p-2 rounded-lg bg-blue-50">
+<input type="text" id="unidadManual" placeholder="Escriba su Sección o Servicio..." class="hidden mt-2 w-full border border-blue-400 p-2 rounded-lg bg-blue-50 dark:bg-slate-800 dark:text-white">
 </div>
 <div>
-<label class="font-bold text-slate-700 block mb-1 uppercase">GRADO Y NOMBRE DEL RESPONSABLE *</label>
-<input type="text" id="responsable" placeholder="Ej: Sof. 2do. DESA. Edwin Quispe Aruquipa" required class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-600">
+<label class="font-bold text-slate-700 dark:text-slate-300 block mb-1 uppercase">GRADO Y NOMBRE DEL RESPONSABLE *</label>
+<input type="text" id="responsable" placeholder="Ej: Sof. 2do. DESA. Edwin Quispe Aruquipa" required class="w-full border border-slate-300 dark:border-slate-700 p-2 rounded-lg outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-blue-600">
 </div>
 </div>
 
 <!-- 1. DESGLOSE FUERZA -->
-<div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
-<h3 class="font-bold text-slate-700 uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-users text-blue-700"></i> 1. Desglose de Personal (Suma al Efectivo)</h3>
+<div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+<h3 class="font-bold text-slate-700 dark:text-slate-200 uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-users text-blue-700 dark:text-blue-400"></i> 1. Desglose de Personal (Suma al Efectivo)</h3>
 <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
-<div><label class="text-[10px] block font-semibold text-slate-600">Militar</label><input type="number" id="mil" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-slate-600">Civil Ítem</label><input type="number" id="itm" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-blue-900">P-121</label><input type="number" id="p121" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-blue-900">P-251</label><input type="number" id="p251" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-blue-900">P-252</label><input type="number" id="p252" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 rounded-lg p-1.5 text-center font-bold bg-white"></div>
-<div><label class="text-[10px] block font-semibold text-slate-600">Tropa/Seg.</label><input type="number" id="trp" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border rounded-lg p-1.5 text-center font-bold bg-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600 dark:text-slate-400">Militar</label><input type="number" id="mil" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600 dark:text-slate-400">Civil Ítem</label><input type="number" id="itm" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900 dark:text-blue-300">P-121</label><input type="number" id="p121" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 dark:border-blue-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900 dark:text-blue-300">P-251</label><input type="number" id="p251" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 dark:border-blue-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900 dark:text-blue-300">P-252</label><input type="number" id="p252" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 dark:border-blue-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600 dark:text-slate-400">Tropa/Seg.</label><input type="number" id="trp" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
 </div>
-<div class="mt-2.5 pt-2 border-t flex justify-between font-bold text-xs">
-<span>EFECTIVO TOTAL REGISTRADO:</span><span id="txtEfectivoTotal" class="text-blue-800 text-sm font-black">0</span>
+<div class="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-bold text-xs">
+<span>EFECTIVO TOTAL REGISTRADO:</span><span id="txtEfectivoTotal" class="text-blue-800 dark:text-blue-400 text-sm font-black">0</span>
 </div>
 </div>
 
 <!-- 2. NOVEDADES (RESTAN) -->
-<div class="bg-amber-50/70 p-3.5 rounded-lg border border-amber-200">
+<div class="bg-amber-50/70 dark:bg-amber-950/20 p-3.5 rounded-lg border border-amber-200 dark:border-amber-800/50">
 <div class="flex justify-between items-center mb-2.5">
-<h3 class="font-bold text-amber-900 uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-minus text-rose-600"></i> 2. Novedades (Restan automáticamente de Forman)</h3>
-<span class="text-[10px] bg-white px-2 py-0.5 rounded-full border border-amber-300 font-bold shadow-xs">Total No Forman: <b id="txtTotalAusentes" class="text-rose-700">0</b></span>
+<h3 class="font-bold text-amber-900 dark:text-amber-300 uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-minus text-rose-600 dark:text-rose-400"></i> 2. Novedades (Restan automáticamente de Forman)</h3>
+<span class="text-[10px] bg-white dark:bg-slate-800 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-700 font-bold shadow-xs">Total No Forman: <b id="txtTotalAusentes" class="text-rose-700 dark:text-rose-400">0</b></span>
 </div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-<div class="bg-emerald-100 p-2 rounded-lg border-2 border-emerald-500 text-center shadow-xs">
-<label class="block font-black text-emerald-950 text-[10px] uppercase">FORMAN / ASISTEN</label>
-<input type="number" id="novAsiste" value="0" readonly class="w-full border rounded p-1 text-center font-black text-emerald-900 bg-white text-sm">
+<div class="bg-emerald-100 dark:bg-emerald-950/50 p-2 rounded-lg border-2 border-emerald-500 dark:border-emerald-600 text-center shadow-xs">
+<label class="block font-black text-emerald-950 dark:text-emerald-200 text-[10px] uppercase">FORMAN / ASISTEN</label>
+<input type="number" id="novAsiste" value="0" readonly class="w-full border border-emerald-300 dark:border-emerald-700 rounded p-1 text-center font-black text-emerald-900 dark:text-emerald-300 bg-white dark:bg-slate-900 text-sm">
 </div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Baja Médica</label><input type="number" id="novBaja" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Vacación</label><input type="number" id="novVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">P/Cuenta Vacación</label><input type="number" id="novCtaVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Guardia HMC</label><input type="number" id="novGuardia" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">P/Cumpleaños</label><input type="number" id="novCumple" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Comisión / FAB</label><input type="number" id="novComision" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Permiso Especial</label><input type="number" id="novPermiso" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Turno Saliente</label><input type="number" id="novSaliente" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Hospitalizado</label><input type="number" id="novHosp" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Faltando s/ Justif.</label><input type="number" id="novFalta" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
-<div><label class="text-[10px] block text-slate-600 font-medium">Cambio de Destino</label><input type="number" id="novCambio" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border rounded-lg p-1 text-center bg-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Baja Médica</label><input type="number" id="novBaja" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Vacación</label><input type="number" id="novVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">P/Cuenta Vacación</label><input type="number" id="novCtaVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Guardia HMC</label><input type="number" id="novGuardia" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">P/Cumpleaños</label><input type="number" id="novCumple" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Comisión / FAB</label><input type="number" id="novComision" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Permiso Especial</label><input type="number" id="novPermiso" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Turno Saliente</label><input type="number" id="novSaliente" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Hospitalizado</label><input type="number" id="novHosp" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Faltando s/ Justif.</label><input type="number" id="novFalta" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Cambio de Destino</label><input type="number" id="novCambio" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
 </div>
 
 <!-- OTROS (MANUAL) -->
-<div class="mt-3 pt-2.5 border-t border-amber-300/80 bg-white p-2.5 rounded-lg border">
-<label class="text-[11px] font-bold text-amber-950 uppercase flex items-center gap-1.5 mb-1.5">
-<i class="fa-solid fa-pen-clip text-amber-700"></i> Otras Novedades (Especificación Manual):
+<div class="mt-3 pt-2.5 border-t border-amber-300/80 dark:border-amber-800/60 bg-white dark:bg-slate-800/80 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
+<label class="text-[11px] font-bold text-amber-950 dark:text-amber-300 uppercase flex items-center gap-1.5 mb-1.5">
+<i class="fa-solid fa-pen-clip text-amber-700 dark:text-amber-400"></i> Otras Novedades (Especificación Manual):
 </label>
 <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
 <div class="sm:col-span-1">
-<label class="text-[10px] text-slate-600 block mb-0.5">Cantidad (Resta):</label>
-<input type="number" id="novOtros" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-amber-300 rounded-lg p-1.5 text-center font-bold bg-amber-50 text-slate-800">
+<label class="text-[10px] text-slate-600 dark:text-slate-400 block mb-0.5">Cantidad (Resta):</label>
+<input type="number" id="novOtros" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-amber-300 dark:border-amber-700 rounded-lg p-1.5 text-center font-bold bg-amber-50 dark:bg-slate-900 text-slate-800 dark:text-white">
 </div>
 <div class="sm:col-span-3">
-<label class="text-[10px] text-slate-600 block mb-0.5">Motivo / Concepto (ej. Fallecimiento, Aislamiento, Licencia):</label>
-<input type="text" id="novOtrosDetalle" placeholder="Escriba el motivo de la ausencia..." class="w-full border rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50">
+<label class="text-[10px] text-slate-600 dark:text-slate-400 block mb-0.5">Motivo / Concepto (ej. Fallecimiento, Aislamiento, Licencia):</label>
+<input type="text" id="novOtrosDetalle" placeholder="Escriba el motivo de la ausencia..." class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50 dark:bg-slate-900 dark:text-white">
 </div>
 </div>
 </div>
@@ -153,8 +163,8 @@ Hospital Militar Central "COSSMIL"
 </div>
 
 <div>
-<label class="font-bold text-slate-700 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Organizado por novedad):</label>
-<textarea id="demostracion" rows="4" placeholder="Ej:&#10;VACACION&#10;MY. DIM. JUAN CARLOS LOPEZ ZEBALLOS&#10;&#10;GUARDIA HMC&#10;SOF. INCL. ANGELICA PEREZ CHAMBILLA&#10;&#10;BAJA MEDICA&#10;SOF.1RO.DEPSS. OSCAR FERNANDEZ ACHA" class="w-full border p-2.5 rounded-lg outline-none font-mono text-xs focus:ring-2 focus:ring-blue-600"></textarea>
+<label class="font-bold text-slate-700 dark:text-slate-300 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Organizado por novedad):</label>
+<textarea id="demostracion" rows="4" placeholder="Ej:&#10;VACACION&#10;MY. DIM. JUAN CARLOS LOPEZ ZEBALLOS&#10;&#10;GUARDIA HMC&#10;SOF. INCL. ANGELICA PEREZ CHAMBILLA&#10;&#10;BAJA MEDICA&#10;SOF.1RO.DEPSS. OSCAR FERNANDEZ ACHA" class="w-full border border-slate-300 dark:border-slate-700 p-2.5 rounded-lg outline-none font-mono text-xs focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-800 dark:text-white"></textarea>
 </div>
 
 <button type="submit" id="btnEnviar" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-black py-3 rounded-lg shadow-md uppercase tracking-wider transition flex items-center justify-center gap-2">
@@ -164,11 +174,11 @@ Hospital Militar Central "COSSMIL"
 </section>
 
 <!-- ================= 2. CUMPLIMIENTO ================= -->
-<section id="view-cumplimiento" class="bg-white rounded-b-lg shadow p-4 hidden">
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
+<section id="view-cumplimiento" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 hidden border border-slate-200 dark:border-slate-800">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 dark:border-slate-800 pb-3 mb-3 gap-2">
 <div>
-<h2 class="font-black text-slate-800 uppercase text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-list-check text-emerald-600"></i> Control de Cumplimiento de Servicios</h2>
-<p class="text-[10px] text-slate-500">Monitoreo en tiempo real de recepción de partes</p>
+<h2 class="font-black text-slate-800 dark:text-white uppercase text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-list-check text-emerald-600 dark:text-emerald-400"></i> Control de Cumplimiento de Servicios</h2>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Monitoreo en tiempo real de recepción de partes</p>
 </div>
 <div class="flex gap-2">
 <button onclick="copiarReporteCumplimiento()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
@@ -178,16 +188,16 @@ Hospital Militar Central "COSSMIL"
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-<div class="border border-emerald-300 rounded-lg p-3 bg-emerald-50/40">
-<h3 class="font-bold text-emerald-800 uppercase mb-2 flex items-center justify-between">
-<span><i class="fa-solid fa-circle-check text-emerald-600"></i> Partes Recibidos</span>
+<div class="border border-emerald-300 dark:border-emerald-800/60 rounded-lg p-3 bg-emerald-50/40 dark:bg-emerald-950/20">
+<h3 class="font-bold text-emerald-800 dark:text-emerald-300 uppercase mb-2 flex items-center justify-between">
+<span><i class="fa-solid fa-circle-check text-emerald-600 dark:text-emerald-400"></i> Partes Recibidos</span>
 <span id="countCumplieron" class="bg-emerald-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
 </h3>
 <div id="listaCumplieron" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
 </div>
-<div class="border border-rose-300 rounded-lg p-3 bg-rose-50/40">
-<h3 class="font-bold text-rose-800 uppercase mb-2 flex items-center justify-between">
-<span><i class="fa-solid fa-clock text-rose-600"></i> Pendientes / Omisos</span>
+<div class="border border-rose-300 dark:border-rose-800/60 rounded-lg p-3 bg-rose-50/40 dark:bg-rose-950/20">
+<h3 class="font-bold text-rose-800 dark:text-rose-300 uppercase mb-2 flex items-center justify-between">
+<span><i class="fa-solid fa-clock text-rose-600 dark:text-rose-400"></i> Pendientes / Omisos</span>
 <span id="countFaltan" class="bg-rose-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
 </h3>
 <div id="listaFaltan" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
@@ -195,15 +205,15 @@ Hospital Militar Central "COSSMIL"
 </div>
 </section>
 
-<!-- ================= 3. PARTE GENERAL (CON DEMOSTRACIÓN CLASIFICADA POR ÁREA) ================= -->
-<section id="view-centralizado" class="bg-white rounded-b-lg shadow p-4 hidden">
+<!-- ================= 3. PARTE GENERAL (TARJETA MODAL PARA IMAGEN) ================= -->
+<section id="view-centralizado" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 hidden border border-slate-200 dark:border-slate-800">
 
-<div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b pb-3 mb-4">
+<div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3 mb-4">
 <div>
-<h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
-<i class="fa-solid fa-file-contract text-blue-700"></i> PARTE GENERAL H.M.C.
+<h2 class="font-black text-slate-900 dark:text-white text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-file-contract text-blue-700 dark:text-blue-400"></i> PARTE GENERAL H.M.C.
 </h2>
-<p class="text-[10px] text-slate-500">Reporte oficial con novedades clasificadas de forma clara por área</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Reporte oficial consolidado en imagen HD para WhatsApp</p>
 </div>
 <div class="flex flex-wrap gap-2">
 <button onclick="generarImagenWhatsAppCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
@@ -221,8 +231,8 @@ Hospital Militar Central "COSSMIL"
 </div>
 </div>
 
-<!-- ================= TARJETA OFICIAL ESTILO MODAL PARA IMAGEN ================= -->
-<div id="tarjetaReporteWhatsApp" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden text-xs">
+<!-- ================= TARJETA OFICIAL ESTILO MODAL ================= -->
+<div id="tarjetaReporteWhatsApp" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden text-xs text-slate-800">
   
   <div class="bg-slate-900 text-white p-4 border-b border-slate-800">
     <div class="flex justify-between items-start">
@@ -291,22 +301,22 @@ Hospital Militar Central "COSSMIL"
 </section>
 
 <!-- ================= 4. TABLA DINÁMICA RESUMEN ================= -->
-<section id="view-tablaResumen" class="bg-white rounded-b-lg shadow p-4 hidden">
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
+<section id="view-tablaResumen" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 hidden border border-slate-200 dark:border-slate-800">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 dark:border-slate-800 pb-3 mb-3 gap-2">
 <div>
-<h2 class="font-black text-slate-900 text-xs sm:text-sm uppercase flex items-center gap-1.5">
-<i class="fa-solid fa-table-cells text-indigo-700"></i> Matriz Dinámica Resumen de Unidades
+<h2 class="font-black text-slate-900 dark:text-white text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-table-cells text-indigo-700 dark:text-indigo-400"></i> Matriz Dinámica Resumen de Unidades
 </h2>
-<p class="text-[10px] text-slate-500">Supervisión comparativa e inspección de comprobantes</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Supervisión comparativa e inspección de comprobantes</p>
 </div>
 <div class="flex items-center gap-2">
-<select id="filtroRapidoUnidad" onchange="filtrarTablaPorSelect(this.value)" class="border rounded-lg p-1.5 text-xs bg-slate-50 outline-none">
+<select id="filtroRapidoUnidad" onchange="filtrarTablaPorSelect(this.value)" class="border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-xs bg-slate-50 dark:bg-slate-800 dark:text-white outline-none">
 <option value="">-- Ver todas las unidades --</option>
 </select>
 </div>
 </div>
 
-<div class="overflow-x-auto my-2 border border-slate-200 rounded-lg shadow-xs">
+<div class="overflow-x-auto my-2 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xs">
 <table class="w-full border-collapse text-left text-xs">
 <thead>
 <tr class="bg-slate-900 text-white text-[10px] uppercase font-bold select-none cursor-pointer">
@@ -324,8 +334,8 @@ Hospital Militar Central "COSSMIL"
 <th class="p-2 border-b border-slate-700 text-center">Acción</th>
 </tr>
 </thead>
-<tbody id="cuerpoTablaDinamica" class="divide-y divide-slate-200 text-[11px]"></tbody>
-<tfoot id="pieTablaDinamica" class="bg-slate-100 font-black text-[11px] border-t-2 border-slate-400"></tfoot>
+<tbody id="cuerpoTablaDinamica" class="divide-y divide-slate-200 dark:divide-slate-800 text-[11px] bg-white dark:bg-slate-900"></tbody>
+<tfoot id="pieTablaDinamica" class="bg-slate-100 dark:bg-slate-800 font-black text-[11px] border-t-2 border-slate-400 dark:border-slate-700"></tfoot>
 </table>
 </div>
 </section>
@@ -334,7 +344,7 @@ Hospital Militar Central "COSSMIL"
 
 <!-- ================= MODAL DETALLE DE CÓMO ENVIÓ LA UNIDAD ================= -->
 <div id="modalDetalleServicio" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
-<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-300">
+<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-300 dark:border-slate-700">
 <div class="bg-slate-900 text-white p-3.5 rounded-t-2xl flex justify-between items-center">
 <div>
 <h3 id="modalTituloServicio" class="font-black text-sm uppercase">Detalle del Servicio</h3>
@@ -343,8 +353,8 @@ Hospital Militar Central "COSSMIL"
 <button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-0.5"><i class="fa-solid fa-xmark"></i></button>
 </div>
 <div id="modalCuerpoDetalle" class="p-4 space-y-3 text-xs"></div>
-<div class="bg-slate-50 p-3 rounded-b-2xl border-t text-right">
-<button onclick="cerrarModalDetalle()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Cerrar</button>
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-b-2xl border-t border-slate-200 dark:border-slate-700 text-right">
+<button onclick="cerrarModalDetalle()" class="bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Cerrar</button>
 </div>
 </div>
 </div>
@@ -364,6 +374,36 @@ var partes=[];
 var ordenActualColumna = '';
 var ordenAscendente = true;
 
+// GESTIÓN DE MODO OSCURO
+function toggleModoOscuro() {
+  document.documentElement.classList.toggle('dark');
+  var esOscuro = document.documentElement.classList.contains('dark');
+  localStorage.setItem('hmc_modo_oscuro', esOscuro ? '1' : '0');
+  actualizarIconoTema(esOscuro);
+}
+
+function actualizarIconoTema(esOscuro) {
+  var ico = document.getElementById('iconoModoOscuro');
+  var txt = document.getElementById('txtModoOscuro');
+  if (ico) {
+    ico.className = esOscuro ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-amber-300';
+  }
+  if (txt) {
+    txt.innerText = esOscuro ? 'Modo Claro' : 'Modo Oscuro';
+  }
+}
+
+function cargarPreferenciaModoOscuro() {
+  var guardado = localStorage.getItem('hmc_modo_oscuro');
+  var esOscuro = guardado === '1';
+  if (esOscuro) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+  actualizarIconoTema(esOscuro);
+}
+
 function setTxt(id, val){ var el = document.getElementById(id); if(el) el.innerText = val; }
 function setHtml(id, val){ var el = document.getElementById(id); if(el) el.innerHTML = val; }
 
@@ -374,7 +414,6 @@ var meses=["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DI
 return `${dia}${h}${m}-${meses[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`;
 }
 
-// Reloj inmediato sin demora
 function actualizarReloj(){
 var ahora = new Date();
 var str = `FH: ${obtenerFechaMilitar(ahora)} (${ahora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})})`;
@@ -412,7 +451,7 @@ function switchTab(t){
 var sec = document.getElementById(`view-${v}`);
 if(sec) sec.classList.toggle('hidden', v!==t);
 var b=document.getElementById(`tab-${v}`);
-if(b) b.className=v===t?'px-4 py-2.5 active-tab whitespace-nowrap':'px-4 py-2.5 text-slate-600 whitespace-nowrap';
+if(b) b.className=v===t?'px-4 py-2.5 active-tab whitespace-nowrap':'px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap';
 });
 if(t==='cumplimiento') renderizarCumplimiento();
 if(t==='centralizado') renderizarCentralizado();
@@ -443,6 +482,7 @@ if(asis) asis.value=forman;
 }
 
 function initApp(){
+    cargarPreferenciaModoOscuro();
     actualizarReloj();
     document.querySelectorAll('.calc-efectivo,.calc-novedad').forEach(i=>{
         i.addEventListener('input',recalcularTodo);
@@ -530,8 +570,8 @@ var ok=0,pend=0;
 partes.forEach(p=>{
 ok++;
 var d=document.createElement('div');
-d.className='bg-white p-2.5 rounded-lg border border-emerald-200 shadow-sm flex justify-between items-center';
-d.innerHTML=`<div><div class="font-bold text-slate-800">${p.unidad}</div><div class="text-[10px] text-slate-500">${p.responsable}</div></div><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]"><i class="fa-regular fa-clock"></i> ${p.horaEnvio}</span>`;
+d.className='bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50 shadow-sm flex justify-between items-center';
+d.innerHTML=`<div><div class="font-bold text-slate-800 dark:text-slate-100">${p.unidad}</div><div class="text-[10px] text-slate-500 dark:text-slate-400">${p.responsable}</div></div><span class="bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-bold px-2 py-0.5 rounded text-[10px]"><i class="fa-regular fa-clock"></i> ${p.horaEnvio}</span>`;
 c.appendChild(d);
 });
 
@@ -539,8 +579,8 @@ SERVICIOS_OFICIALES.forEach(s=>{
 if(!env.includes(s.toLowerCase())){
 pend++;
 var d=document.createElement('div');
-d.className='bg-white p-2.5 rounded-lg border border-rose-200 shadow-sm flex justify-between items-center';
-d.innerHTML=`<span class="text-rose-900 font-semibold">${s}</span><span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded text-[10px]">PENDIENTE</span>`;
+d.className='bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-rose-200 dark:border-rose-800/50 shadow-sm flex justify-between items-center';
+d.innerHTML=`<span class="text-rose-900 dark:text-rose-300 font-semibold">${s}</span><span class="bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-700 font-bold px-1.5 py-0.5 rounded text-[10px]">PENDIENTE</span>`;
 f.appendChild(d);
 }
 });
@@ -585,7 +625,6 @@ var noFormanUnidad = (p.efectivo||0) - (p.asisten||0);
 var tieneTexto = p.demostracion && p.demostracion.trim().length > 0;
 var tieneOtros = p.otrosCantidad > 0 && p.otrosDetalle;
 
-// Clasificación estricta por área
 if(noFormanUnidad > 0 || tieneTexto || tieneOtros){
     var tituloArea = `■ ${p.unidad.toUpperCase()} (Novedades: ${noFormanUnidad}):`;
     var cuerpoArea = [];
@@ -628,7 +667,6 @@ setHtml('cardListaNovedades', `
 <div class="flex justify-between"><span>Otros:</span><b>${nov.otros}</b></div>
 `);
 
-// Inyectar en el recuadro negro terminal la demostración clasificada
 var term = document.getElementById('cardDemostracionTerminal');
 if(term){
     if(bloquesDemostracionPorArea.length > 0){
@@ -681,23 +719,23 @@ totEf += p.efectivo; totMil += p.mil; totItm += p.itm; totP121 += p.p121;
 totP251 += p.p251; totP252 += p.p252; totTrp += p.trp; totAsis += p.asisten; totNoF += noF;
 
 var tr = document.createElement('tr');
-tr.className = 'hover:bg-slate-50 transition border-b border-slate-200';
+tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800 transition border-b border-slate-200 dark:border-slate-800';
 tr.innerHTML = `
-<td class="p-2 font-bold text-slate-800">
+<td class="p-2 font-bold text-slate-800 dark:text-slate-100">
 <div>${p.unidad}</div>
 <div class="text-[9px] text-slate-400 font-normal"><i class="fa-regular fa-clock"></i> ${p.horaEnvio} | ${p.responsable}</div>
 </td>
-<td class="p-2 text-center font-bold text-blue-900">${p.efectivo}</td>
-<td class="p-2 text-center text-slate-600">${p.mil}</td>
-<td class="p-2 text-center text-slate-600">${p.itm}</td>
-<td class="p-2 text-center text-blue-800">${p.p121||0}</td>
-<td class="p-2 text-center text-blue-800">${p.p251||0}</td>
-<td class="p-2 text-center text-blue-800">${p.p252||0}</td>
-<td class="p-2 text-center text-slate-600">${p.trp}</td>
-<td class="p-2 text-center font-bold text-emerald-700 bg-emerald-50/50">${p.asisten}</td>
-<td class="p-2 text-center font-bold ${noF>0?'text-rose-700 bg-rose-50/50':'text-slate-400'}">${noF}</td>
+<td class="p-2 text-center font-bold text-blue-900 dark:text-blue-400">${p.efectivo}</td>
+<td class="p-2 text-center text-slate-600 dark:text-slate-300">${p.mil}</td>
+<td class="p-2 text-center text-slate-600 dark:text-slate-300">${p.itm}</td>
+<td class="p-2 text-center text-blue-800 dark:text-blue-300">${p.p121||0}</td>
+<td class="p-2 text-center text-blue-800 dark:text-blue-300">${p.p251||0}</td>
+<td class="p-2 text-center text-blue-800 dark:text-blue-300">${p.p252||0}</td>
+<td class="p-2 text-center text-slate-600 dark:text-slate-300">${p.trp}</td>
+<td class="p-2 text-center font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20">${p.asisten}</td>
+<td class="p-2 text-center font-bold ${noF>0?'text-rose-700 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/20':'text-slate-400'}">${noF}</td>
 <td class="p-2 text-center">
-<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${pct>=90?'bg-emerald-100 text-emerald-800':(pct>=75?'bg-amber-100 text-amber-800':'bg-rose-100 text-rose-800')}">${pct}%</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${pct>=90?'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700':(pct>=75?'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700':'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-700')}">${pct}%</span>
 </td>
 <td class="p-2 text-center">
 <button onclick="verDetalleEnvio('${encodeURIComponent(p.unidad)}')" class="bg-blue-800 hover:bg-blue-900 text-white px-2 py-1 rounded text-[10px] font-bold shadow-xs transition">
@@ -711,17 +749,17 @@ tbody.appendChild(tr);
 var totPct = totEf > 0 ? Math.round((totAsis / totEf) * 100) : 0;
 tfoot.innerHTML = `
 <tr>
-<td class="p-2 uppercase text-slate-800">TOTAL GENERAL:</td>
-<td class="p-2 text-center text-blue-900">${totEf}</td>
+<td class="p-2 uppercase text-slate-800 dark:text-slate-200">TOTAL GENERAL:</td>
+<td class="p-2 text-center text-blue-900 dark:text-blue-400">${totEf}</td>
 <td class="p-2 text-center">${totMil}</td>
 <td class="p-2 text-center">${totItm}</td>
 <td class="p-2 text-center">${totP121}</td>
 <td class="p-2 text-center">${totP251}</td>
 <td class="p-2 text-center">${totP252}</td>
 <td class="p-2 text-center">${totTrp}</td>
-<td class="p-2 text-center text-emerald-800">${totAsis}</td>
-<td class="p-2 text-center text-rose-800">${totNoF}</td>
-<td class="p-2 text-center text-blue-900">${totPct}%</td>
+<td class="p-2 text-center text-emerald-800 dark:text-emerald-400">${totAsis}</td>
+<td class="p-2 text-center text-rose-800 dark:text-rose-400">${totNoF}</td>
+<td class="p-2 text-center text-blue-900 dark:text-blue-400">${totPct}%</td>
 <td class="p-2 text-center text-slate-500 font-normal">--</td>
 </tr>
 `;
@@ -768,30 +806,30 @@ var noF = (p.efectivo||0) - (p.asisten||0);
 var cuerpo = document.getElementById('modalCuerpoDetalle');
 if(cuerpo){
 cuerpo.innerHTML = `
-<div class="bg-slate-50 border p-2.5 rounded-lg">
-<div class="text-[10px] font-bold text-slate-500 uppercase">RESPONSABLE OFICIAL:</div>
-<div class="text-xs font-black text-slate-900">${p.responsable}</div>
+<div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-lg">
+<div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">RESPONSABLE OFICIAL:</div>
+<div class="text-xs font-black text-slate-900 dark:text-white">${p.responsable}</div>
 </div>
 
-<div class="border rounded-lg p-2.5 bg-blue-50/50">
-<div class="text-[10px] font-bold uppercase text-blue-900 mb-1">EFECTIVO DESGLOSADO:</div>
+<div class="border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 bg-blue-50/50 dark:bg-blue-950/20">
+<div class="text-[10px] font-bold uppercase text-blue-900 dark:text-blue-300 mb-1">EFECTIVO DESGLOSADO:</div>
 <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
-<div class="bg-white p-1 rounded border">Mil: <b>${p.mil}</b></div>
-<div class="bg-white p-1 rounded border">Ítem: <b>${p.itm}</b></div>
-<div class="bg-white p-1 rounded border text-blue-800">P-121: <b>${p.p121||0}</b></div>
-<div class="bg-white p-1 rounded border text-blue-800">P-251: <b>${p.p251||0}</b></div>
-<div class="bg-white p-1 rounded border text-blue-800">P-252: <b>${p.p252||0}</b></div>
-<div class="bg-white p-1 rounded border">Trp: <b>${p.trp}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700">Mil: <b>${p.mil}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700">Ítem: <b>${p.itm}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 text-blue-800 dark:text-blue-300">P-121: <b>${p.p121||0}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 text-blue-800 dark:text-blue-300">P-251: <b>${p.p251||0}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 text-blue-800 dark:text-blue-300">P-252: <b>${p.p252||0}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700">Trp: <b>${p.trp}</b></div>
 </div>
-<div class="mt-2 pt-1 border-t flex justify-between font-bold text-xs">
-<span>Total Efectivo: <b class="text-blue-900">${p.efectivo}</b></span>
-<span class="text-emerald-700">Forman: <b>${p.asisten}</b></span>
-<span class="${noF>0?'text-rose-700':'text-slate-500'}">No Forman: <b>${noF}</b></span>
+<div class="mt-2 pt-1 border-t border-slate-200 dark:border-slate-700 flex justify-between font-bold text-xs">
+<span>Total Efectivo: <b class="text-blue-900 dark:text-blue-300">${p.efectivo}</b></span>
+<span class="text-emerald-700 dark:text-emerald-400">Forman: <b>${p.asisten}</b></span>
+<span class="${noF>0?'text-rose-700 dark:text-rose-400':'text-slate-500'}">No Forman: <b>${noF}</b></span>
 </div>
 </div>
 
-<div class="border rounded-lg p-2.5 bg-amber-50/40">
-<div class="text-[10px] font-bold uppercase text-amber-900 mb-1">NOVEDADES NUMÉRICAS:</div>
+<div class="border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 bg-amber-50/40 dark:bg-amber-950/20">
+<div class="text-[10px] font-bold uppercase text-amber-900 dark:text-amber-300 mb-1">NOVEDADES NUMÉRICAS:</div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
 <div>Baja: <b>${p.baja||0}</b></div>
 <div>Vacación: <b>${p.vacacion||0}</b></div>
@@ -802,12 +840,12 @@ cuerpo.innerHTML = `
 <div>Saliente: <b>${p.saliente||0}</b></div>
 <div>Hospitalizado: <b>${p.hospitalizado||0}</b></div>
 </div>
-${p.otrosCantidad > 0 ? `<div class="mt-1 pt-1 border-t text-[10px] text-amber-900 font-semibold">Otros (${p.otrosCantidad}): ${p.otrosDetalle || 'Sin detalle'}</div>` : ''}
+${p.otrosCantidad > 0 ? `<div class="mt-1 pt-1 border-t border-amber-200 dark:border-amber-800 text-[10px] text-amber-900 dark:text-amber-300 font-semibold">Otros (${p.otrosCantidad}): ${p.otrosDetalle || 'Sin detalle'}</div>` : ''}
 </div>
 
 <div>
-<div class="text-[10px] font-bold uppercase text-slate-700 mb-1">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
-<div class="bg-slate-900 text-slate-100 p-2.5 rounded-lg font-mono text-[10px] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
+<div class="text-[10px] font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
+<div class="bg-slate-950 text-slate-100 p-2.5 rounded-lg font-mono text-[10px] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto border border-slate-800">
 ${p.demostracion ? p.demostracion : 'Sin demostración nominal.'}
 </div>
 </div>
@@ -896,49 +934,4 @@ var bloquesWhatsAppAreas = [];
 partes.forEach(p=>{
 tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
 nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
-nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
-nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
-
-var noF = (p.efectivo||0) - (p.asisten||0);
-var tieneTxt = p.demostracion && p.demostracion.trim().length > 0;
-var tieneOtr = p.otrosCantidad > 0 && p.otrosDetalle;
-
-if(noF > 0 || tieneTxt || tieneOtr){
-    var txtUnidad = `■ *${p.unidad.toUpperCase()}* (Nov: ${noF})\n`;
-    if(tieneTxt) txtUnidad += `${p.demostracion.trim()}\n`;
-    if(tieneOtr) txtUnidad += `• Otros: ${p.otrosDetalle} (${p.otrosCantidad})\n`;
-    bloquesWhatsAppAreas.push(txtUnidad.trim());
-}
-});
-
-var noForman = tEf - tAsis;
-
-var msg = `*PARTE GENERAL H.M.C.*\n`;
-msg += `*MINISTERIO DE DEFENSA*\n`;
-msg += `*FH.:* ${obtenerFechaMilitar()}\n\n`;
-
-msg += `*1. EFECTIVO GENERAL:* ${tEf}\n`;
-msg += `• Mil: ${tMil} | Ítem: ${tItm} | P-121: ${tP121}\n`;
-msg += `• P-251: ${tP251} | P-252: ${tP252} | Tropa: ${tTrp}\n`;
-msg += `🟢 *FORMAN / ASISTEN:* ${tAsis}\n`;
-msg += `🔴 *NO FORMAN:* ${noForman}\n\n`;
-
-msg += `*2. NOVEDADES REGISTRADAS*\n`;
-msg += `• Baja: ${nov.baja} | Vacación: ${nov.vac}\n• P/Cta: ${nov.cta} | Guardia: ${nov.guardia}\n• Comisión: ${nov.com} | Otros: ${nov.otros}\n\n`;
-
-msg += `*3. DEMOSTRACIÓN NOMINAL POR ÁREAS:*\n`;
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-if(bloquesWhatsAppAreas.length > 0){
-    msg += bloquesWhatsAppAreas.join('\n\n') + '\n';
-} else {
-    msg += `_Sin novedades de personal registradas en ninguna unidad._\n`;
-}
-msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-
-msg += `*ATTE.*\n*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\nHospital Militar Central "COSSMIL"`;
-
-navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Texto copiado al portapapeles con novedades clasificadas por área!'));
-}
-</script>
-</body>
-</html>
+nov.cum
