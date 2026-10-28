@@ -1,94 +1,1107 @@
 <!DOCTYPE html>
 <html lang="es" class="transition-colors duration-200">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dashboard Partes HMC COSSMIL</title>
-<script src="https://cdn.tailwindcss.com/3.4.17"></script>
-<script>tailwind.config={darkMode:'class'}</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class'
+  }
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style type="text/tailwindcss">
-@layer components{
-.inp{@apply w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 bg-white dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-600}
-.lbl{@apply text-[10px] block font-semibold text-slate-600 dark:text-slate-400}
-.sec{@apply bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 border border-slate-200 dark:border-slate-800}
-.box{@apply border border-slate-200 dark:border-slate-700 rounded-lg p-2.5}
-.hbtn{@apply text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition}
-}
-</style>
 <style>
 .active-tab{border-bottom:3px solid #1e3a8a;color:#1e3a8a;font-weight:700;background:#f8fafc}
-.dark .active-tab{border-bottom:3px solid #3b82f6;color:#60a5fa;background:#0f172a}
+.dark .active-tab{border-bottom:3px solid #3b82f6;color:#60a5fa;font-weight:700;background:#0f172a}
 @media print{header,nav,.no-print{display:none!important}#view-centralizado{display:block!important;padding:0!important}}
-#hostPrint{display:none}
-@media print{body.ph>*:not(#hostPrint){display:none!important}body.ph #hostPrint{display:block!important;max-width:640px;margin:0 auto}}
 </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen transition-colors duration-200">
 
+<!-- CONTENEDOR TOAST NOTIFICACIONES -->
+<div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-3"></div>
+
+<!-- Encabezado Institucional COSSMIL (Sin botón manual de nuevo día) -->
 <header class="bg-slate-900 dark:bg-slate-950 text-white shadow-md border-b-4 border-blue-800 p-3">
 <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
-<div class="flex items-center gap-3 w-full md:w-auto">
-<div class="logo w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.5)] flex-shrink-0 flex items-center justify-center text-blue-900"></div>
-<section id="view-historial" class="sec hidden">
-<div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3 mb-3">
-<div><h2 class="font-black uppercase text-xs sm:text-sm"><i class="fa-solid fa-clock-rotate-left text-purple-600 dark:text-purple-400"></i> Historial de Partes Generales</h2>
-<p class="text-[10px] text-slate-500 dark:text-slate-400">Cada jornada se archiva sola al cerrar (00:00 o Nuevo Día)</p></div>
-<button onclick="cargarHistorial()" class="hbtn bg-purple-700 hover:bg-purple-800"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+  
+  <!-- Logo Oficial + Títulos -->
+  <div class="flex items-center gap-3 w-full md:w-auto">
+    <div class="w-12 h-12 rounded-full overflow-hidden bg-white p-0.5 border-2 border-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.5)] flex-shrink-0 flex items-center justify-center">
+      <img id="imgLogoHeader" alt="Escudo Oficial COSSMIL" class="w-full h-full object-contain rounded-full">
+    </div>
+
+    <div>
+      <div class="flex items-center gap-2">
+        <h1 class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-50">H.M.C. "COSSMIL"</h1>
+        <span class="bg-blue-700 text-blue-200 text-[9px] px-1.5 py-0.5 rounded font-mono font-bold">U.A.P.</span>
+      </div>
+      <p class="text-[11px] text-slate-300 flex items-center gap-1.5 mt-0.5 font-medium">
+        <span id="dotEstado" class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="txtEstadoNube" class="font-medium text-emerald-400">Firebase: En Línea</span>
+        <span class="text-slate-500">•</span>
+        <span id="txtUltimaSync" class="text-slate-400 text-[10px] font-mono">Conectando...</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Controles y Reloj -->
+  <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+    <!-- Botón Modo Oscuro / Claro -->
+    <button onclick="toggleModoOscuro()" id="btnModoOscuro" title="Cambiar tema visual" class="no-print bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 px-2.5 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+      <i id="iconoModoOscuro" class="fa-solid fa-moon"></i> <span id="txtModoOscuro" class="hidden sm:inline">Modo Oscuro</span>
+    </button>
+    <!-- Reloj Militar -->
+    <span id="relojVivo" class="text-xs bg-slate-800/90 px-2.5 py-1.5 rounded-lg font-mono text-emerald-400 border border-slate-700 shadow-inner">FH: Calculando...</span>
+  </div>
 </div>
-<div id="listaHistorial" class="space-y-2 text-xs"></div>
+</header>
+
+<!-- Navegación por 5 Módulos -->
+<nav class="max-w-7xl mx-auto px-2 mt-2 no-print">
+<div class="flex border-b border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-t-lg shadow-sm overflow-x-auto text-xs">
+<button onclick="switchTab('registro')" id="tab-registro" class="px-4 py-2.5 active-tab whitespace-nowrap"><i class="fa-solid fa-pen text-blue-700 dark:text-blue-400 mr-1.5"></i> 1. Formulario</button>
+<button onclick="switchTab('cumplimiento')" id="tab-cumplimiento" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap"><i class="fa-solid fa-list-check text-emerald-600 dark:text-emerald-400 mr-1.5"></i> 2. Cumplimiento (<span id="tabCountCumplidos">0</span>)</button>
+<button onclick="switchTab('centralizado')" id="tab-centralizado" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap"><i class="fa-solid fa-file-contract text-amber-600 dark:text-amber-400 mr-1.5"></i> 3. Parte General H.M.C.</button>
+<button onclick="switchTab('tablaResumen')" id="tab-tablaResumen" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap"><i class="fa-solid fa-table-cells text-indigo-600 dark:text-indigo-400 mr-1.5"></i> 4. Tabla Resumen</button>
+<button onclick="switchTab('historial')" id="tab-historial" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap"><i class="fa-solid fa-clock-rotate-left text-purple-600 dark:text-purple-400 mr-1.5"></i> 5. Historial</button>
+</div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-2 pb-12 mt-1">
+
+<!-- ================= 1. FORMULARIO DE ENVÍO ================= -->
+<section id="view-registro" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 border border-slate-200 dark:border-slate-800">
+<div class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white p-3 rounded-lg shadow mb-4 flex flex-wrap justify-between items-center text-xs gap-2 border border-blue-700">
+<span class="font-bold uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-calculator text-amber-400"></i> Balance en Vivo de Fuerza:</span>
+<div class="font-mono text-xs flex gap-1.5 items-center">
+<span class="bg-blue-800/90 px-2 py-0.5 rounded border border-blue-600">Efectivo: <b id="resumenFormulaEf" class="text-emerald-300">0</b></span> -
+<span class="bg-blue-800/90 px-2 py-0.5 rounded border border-blue-600">No Forman: <b id="resumenFormulaNov" class="text-rose-300">0</b></span> =
+<span class="bg-emerald-800 px-2.5 py-0.5 rounded font-black border border-emerald-500 shadow text-white">FORMAN: <b id="resumenFormulaForman" class="text-sm">0</b></span>
+</div>
+</div>
+
+<form id="parteForm" onsubmit="guardarParte(event)" class="space-y-4 text-xs">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div>
+<label class="font-bold text-slate-700 dark:text-slate-300 block mb-1 uppercase">SERVICIO / UNIDAD *</label>
+<select id="unidadSelect" required onchange="verificarOtro(this.value)" class="w-full border border-slate-300 dark:border-slate-700 p-2 rounded-lg bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-600">
+<option value="">-- Seleccionar Servicio --</option>
+<option value="Servicio de Imagenología">Servicio de Imagenología</option>
+<option value="Servicio de Nutrición">Servicio de Nutrición</option>
+<option value="Mantenimiento e Infraestructura">Mantenimiento e Infraestructura</option>
+<option value="Sección Almacenes">Sección Almacenes</option>
+<option value="Sección Activos Fijos">Sección Activos Fijos</option>
+<option value="Sección Lavandería">Sección Lavandería</option>
+<option value="Servicio de Patología">Servicio de Patología</option>
+<option value="Vigencia de Derechos">Vigencia de Derechos</option>
+<option value="Casa Adulto Mayor">Casa Adulto Mayor</option>
+<option value="Compañía de Seguridad H.M.C.">Compañía de Seguridad H.M.C.</option>
+<option value="Sección Adquisición y Contrataciones">Sección Adquisición y Contrataciones</option>
+<option value="Unidad Administrativa Financiera">Unidad Administrativa Financiera</option>
+<option value="Citas Médicas">Citas Médicas</option>
+<option value="__OTRO__">➕ OTRO (Escribir manualmente)</option>
+</select>
+<input type="text" id="unidadManual" placeholder="Escriba su Sección o Servicio..." class="hidden mt-2 w-full border border-blue-400 p-2 rounded-lg bg-blue-50 dark:bg-slate-800 dark:text-white">
+</div>
+<div>
+<label class="font-bold text-slate-700 dark:text-slate-300 block mb-1 uppercase">GRADO Y NOMBRE DEL RESPONSABLE *</label>
+<input type="text" id="responsable" placeholder="Ej: Sof. 2do. DESA. Edwin Quispe Aruquipa" required class="w-full border border-slate-300 dark:border-slate-700 p-2 rounded-lg outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-blue-600">
+</div>
+</div>
+
+<!-- 1. DESGLOSE FUERZA -->
+<div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+<h3 class="font-bold text-slate-700 dark:text-slate-200 uppercase mb-2 flex items-center gap-1.5"><i class="fa-solid fa-users text-blue-700 dark:text-blue-400"></i> 1. Desglose de Personal (Suma al Efectivo)</h3>
+<div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
+<div><label class="text-[10px] block font-semibold text-slate-600 dark:text-slate-400">Militar</label><input type="number" id="mil" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600 dark:text-slate-400">Civil Ítem</label><input type="number" id="itm" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900 dark:text-blue-300">P-121</label><input type="number" id="p121" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 dark:border-blue-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900 dark:text-blue-300">P-251</label><input type="number" id="p251" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 dark:border-blue-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-blue-900 dark:text-blue-300">P-252</label><input type="number" id="p252" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-blue-300 dark:border-blue-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+<div><label class="text-[10px] block font-semibold text-slate-600 dark:text-slate-400">Tropa/Seg.</label><input type="number" id="trp" value="0" min="0" onfocus="this.select()" class="calc-efectivo w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-center font-bold bg-white dark:bg-slate-900 dark:text-white"></div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-bold text-xs">
+<span>EFECTIVO TOTAL REGISTRADO:</span><span id="txtEfectivoTotal" class="text-blue-800 dark:text-blue-400 text-sm font-black">0</span>
+</div>
+</div>
+
+<!-- 2. NOVEDADES (RESTAN) -->
+<div class="bg-amber-50/70 dark:bg-amber-950/20 p-3.5 rounded-lg border border-amber-200 dark:border-amber-800/50">
+<div class="flex justify-between items-center mb-2.5">
+<h3 class="font-bold text-amber-900 dark:text-amber-300 uppercase flex items-center gap-1.5"><i class="fa-solid fa-user-minus text-rose-600 dark:text-rose-400"></i> 2. Novedades (Restan automáticamente de Forman)</h3>
+<span class="text-[10px] bg-white dark:bg-slate-800 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-700 font-bold shadow-xs">Total No Forman: <b id="txtTotalAusentes" class="text-rose-700 dark:text-rose-400">0</b></span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+<div class="bg-emerald-100 dark:bg-emerald-950/50 p-2 rounded-lg border-2 border-emerald-500 dark:border-emerald-600 text-center shadow-xs">
+<label class="block font-black text-emerald-950 dark:text-emerald-200 text-[10px] uppercase">FORMAN / ASISTEN</label>
+<input type="number" id="novAsiste" value="0" readonly class="w-full border border-emerald-300 dark:border-emerald-700 rounded p-1 text-center font-black text-emerald-900 dark:text-emerald-300 bg-white dark:bg-slate-900 text-sm">
+</div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Baja Médica</label><input type="number" id="novBaja" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Vacación</label><input type="number" id="novVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">P/Cuenta Vacación</label><input type="number" id="novCtaVacacion" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Guardia HMC</label><input type="number" id="novGuardia" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">P/Cumpleaños</label><input type="number" id="novCumple" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<!-- CAMBIO APLICADO: Solo Comisión -->
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Comisión</label><input type="number" id="novComision" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Permiso Especial</label><input type="number" id="novPermiso" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Turno Saliente</label><input type="number" id="novSaliente" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Hospitalizado</label><input type="number" id="novHosp" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Faltando s/ Justif.</label><input type="number" id="novFalta" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+<div><label class="text-[10px] block text-slate-600 dark:text-slate-400 font-medium">Cambio de Destino</label><input type="number" id="novCambio" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1 text-center bg-white dark:bg-slate-900 dark:text-white font-semibold"></div>
+</div>
+
+<!-- OTROS (MANUAL) -->
+<div class="mt-3 pt-2.5 border-t border-amber-300/80 dark:border-amber-800/60 bg-white dark:bg-slate-800/80 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
+<label class="text-[11px] font-bold text-amber-950 dark:text-amber-300 uppercase flex items-center gap-1.5 mb-1.5">
+<i class="fa-solid fa-pen-clip text-amber-700 dark:text-amber-400"></i> Otras Novedades (Especificación Manual):
+</label>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+<div class="sm:col-span-1">
+<label class="text-[10px] text-slate-600 dark:text-slate-400 block mb-0.5">Cantidad (Resta):</label>
+<input type="number" id="novOtros" value="0" min="0" onfocus="this.select()" class="calc-novedad w-full border border-amber-300 dark:border-amber-700 rounded-lg p-1.5 text-center font-bold bg-amber-50 dark:bg-slate-900 text-slate-800 dark:text-white">
+</div>
+<div class="sm:col-span-3">
+<label class="text-[10px] text-slate-600 dark:text-slate-400 block mb-0.5">Motivo / Concepto (ej. Fallecimiento, Aislamiento, Licencia):</label>
+<input type="text" id="novOtrosDetalle" placeholder="Escriba el motivo de la ausencia..." class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50 dark:bg-slate-900 dark:text-white">
+</div>
+</div>
+</div>
+
+</div>
+
+<div>
+<label class="font-bold text-slate-700 dark:text-slate-300 block mb-1 uppercase">DEMOSTRACIÓN NOMINAL (Organizado por novedad):</label>
+<textarea id="demostracion" rows="4" placeholder="Ej:&#10;VACACION&#10;MY. DIM. JUAN CARLOS LOPEZ ZEBALLOS&#10;&#10;GUARDIA HMC&#10;SOF. INCL. ANGELICA PEREZ CHAMBILLA&#10;&#10;BAJA MEDICA&#10;SOF.1RO.DEPSS. OSCAR FERNANDEZ ACHA" class="w-full border border-slate-300 dark:border-slate-700 p-2.5 rounded-lg outline-none font-mono text-xs focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-800 dark:text-white"></textarea>
+</div>
+
+<button type="submit" id="btnEnviar" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-black py-3 rounded-lg shadow-md uppercase tracking-wider transition flex items-center justify-center gap-2">
+<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Parte Oficial a la Nube
+</button>
+</form>
 </section>
+
+<!-- ================= 2. CUMPLIMIENTO ================= -->
+<section id="view-cumplimiento" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 hidden border border-slate-200 dark:border-slate-800">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 dark:border-slate-800 pb-3 mb-3 gap-2">
+<div>
+<h2 class="font-black text-slate-800 dark:text-white uppercase text-xs sm:text-sm flex items-center gap-1.5"><i class="fa-solid fa-list-check text-emerald-600 dark:text-emerald-400"></i> Control de Cumplimiento de Servicios</h2>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Monitoreo en tiempo real de recepción de partes</p>
+</div>
+<div class="flex gap-2">
+<button onclick="copiarReporteCumplimiento()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+<i class="fa-brands fa-whatsapp text-sm"></i> Copiar Cumplimiento
+</button>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+<div class="border border-emerald-300 dark:border-emerald-800/50 rounded-lg p-3 bg-emerald-50/40 dark:bg-emerald-950/20">
+<h3 class="font-bold text-emerald-800 dark:text-emerald-300 uppercase mb-2 flex items-center justify-between">
+<span><i class="fa-solid fa-circle-check text-emerald-600"></i> Partes Recibidos</span>
+<span id="countCumplieron" class="bg-emerald-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
+</h3>
+<div id="listaCumplieron" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
+</div>
+<div class="border border-rose-300 dark:border-rose-800/50 rounded-lg p-3 bg-rose-50/40 dark:bg-rose-950/20">
+<h3 class="font-bold text-rose-800 dark:text-rose-300 uppercase mb-2 flex items-center justify-between">
+<span><i class="fa-solid fa-clock text-rose-600"></i> Pendientes / Omisos</span>
+<span id="countFaltan" class="bg-rose-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black">0</span>
+</h3>
+<div id="listaFaltan" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
+</div>
+</div>
+</section>
+
+<!-- ================= 3. PARTE GENERAL (TARJETA MODAL PARA IMAGEN) ================= -->
+<section id="view-centralizado" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 hidden border border-slate-200 dark:border-slate-800">
+
+<div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-3 mb-4">
+<div>
+<h2 class="font-black text-slate-900 dark:text-white text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-file-contract text-blue-700 dark:text-blue-400"></i> PARTE GENERAL H.M.C.
+</h2>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Reporte oficial consolidado en imagen HD para WhatsApp (Se archiva a las 00:00)</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<button onclick="generarImagenWhatsAppCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow flex items-center gap-1.5 transition">
+<i class="fa-solid fa-image text-emerald-200"></i> Descargar Imagen WhatsApp
+</button>
+<button onclick="copiarResumenWhatsApp()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-regular fa-copy text-slate-300"></i> Copiar Texto
+</button>
+<button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+<i class="fa-solid fa-print text-sm"></i> Imprimir / PDF
+</button>
+</div>
+</div>
+
+<!-- ================= TARJETA OFICIAL ESTILO MODAL CON ESCUDO COSSMIL ================= -->
+<div id="tarjetaReporteWhatsApp" class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden text-xs text-slate-800">
+  
+  <div class="bg-slate-900 text-white p-4 border-b border-slate-800 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-full overflow-hidden bg-white p-0.5 border border-white/60 shadow-md flex-shrink-0 flex items-center justify-center">
+        <img id="imgLogoCard" alt="Escudo Oficial COSSMIL" class="w-full h-full object-contain rounded-full">
+      </div>
+      <div>
+        <h2 class="font-black text-base uppercase tracking-wider text-white">
+          PARTE GENERAL H.M.C.
+        </h2>
+        <p class="text-[11px] text-slate-300 font-mono mt-0.5" id="cardReporteFH">
+          FH: --
+        </p>
+      </div>
+    </div>
+    <span class="bg-blue-800 text-blue-200 border border-blue-600 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+      U.A.P.
+    </span>
+  </div>
+
+  <div class="p-4 space-y-3.5 bg-white">
+    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl shadow-xs">
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">RESPONSABLE OFICIAL:</div>
+      <div class="text-xs font-black text-slate-900 mt-0.5 tracking-wide">
+        JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL
+      </div>
+    </div>
+
+    <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">EFECTIVO DESGLOSADO:</div>
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Mil: <span id="cardMil" class="text-slate-900">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Ítem: <span id="cardItm" class="text-slate-900">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-121: <span id="cardP121">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-251: <span id="cardP251">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg text-blue-900">P-252: <span id="cardP252">0</span></div>
+        <div class="bg-slate-50 border border-slate-200 py-1.5 rounded-lg">Trp: <span id="cardTrp" class="text-slate-900">0</span></div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-slate-200 flex justify-between items-center text-xs font-bold">
+        <span>Total Efectivo: <b id="cardTotalEf" class="text-slate-900 text-sm">0</b></span>
+        <span class="text-emerald-700">Forman: <b id="cardTotalForman" class="text-sm">0</b></span>
+        <span class="text-rose-700">No Forman: <b id="cardTotalNoForman" class="text-sm">0</b></span>
+      </div>
+    </div>
+
+    <!-- Novedades Numéricas con "Comisión" -->
+    <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-2">NOVEDADES NUMÉRICAS:</div>
+      <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-700 font-medium" id="cardListaNovedades"></div>
+    </div>
+
+    <!-- DEMOSTRACIÓN CLASIFICADA POR ÁREA -->
+    <div>
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+        <span>DEMOSTRACIÓN NOMINAL ENVIADA (POR ÁREAS):</span>
+        <span class="text-[9px] text-slate-400 font-normal">Clasificado por unidad</span>
+      </div>
+      <div id="cardDemostracionTerminal" class="bg-slate-950 text-slate-100 p-3.5 rounded-xl font-mono text-[11px] leading-relaxed whitespace-pre-line shadow-inner max-h-72 overflow-y-auto border border-slate-800">
+        Sin novedades registradas.
+      </div>
+    </div>
+
+    <div class="pt-2 text-center border-t border-slate-200">
+      <div class="text-[10px] font-black uppercase text-slate-800">MINISTERIO DE DEFENSA</div>
+      <div class="text-[9px] text-slate-500 font-semibold">Hospital Militar Central "COSSMIL"</div>
+    </div>
+  </div>
+</div>
+
+</section>
+
+<!-- ================= 4. TABLA DINÁMICA RESUMEN ================= -->
+<section id="view-tablaResumen" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 hidden border border-slate-200 dark:border-slate-800">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-3 gap-2">
+<div>
+<h2 class="font-black text-slate-900 dark:text-white text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-table-cells text-indigo-700 dark:text-indigo-400"></i> Matriz Dinámica Resumen de Unidades
+</h2>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Supervisión comparativa e inspección de comprobantes</p>
+</div>
+<div class="flex items-center gap-2">
+<select id="filtroRapidoUnidad" onchange="filtrarTablaPorSelect(this.value)" class="border border-slate-300 dark:border-slate-700 rounded-lg p-1.5 text-xs bg-slate-50 dark:bg-slate-800 dark:text-white outline-none">
+<option value="">-- Ver todas las unidades --</option>
+</select>
+</div>
+</div>
+
+<div class="overflow-x-auto my-2 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xs">
+<table class="w-full border-collapse text-left text-xs">
+<thead>
+<tr class="bg-slate-900 text-white text-[10px] uppercase font-bold select-none cursor-pointer">
+<th onclick="ordenarTabla('unidad')" class="p-2 border-b border-slate-700 hover:bg-slate-800">Unidad / Servicio ⬍</th>
+<th onclick="ordenarTabla('efectivo')" class="p-2 border-b border-slate-700 text-center hover:bg-slate-800">Ef ⬍</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Mil</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Ítem</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-121</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-251</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">P-252</th>
+<th class="p-2 border-b border-slate-700 text-center text-slate-300">Trp</th>
+<th onclick="ordenarTabla('asisten')" class="p-2 border-b border-slate-700 text-center bg-emerald-900 hover:bg-emerald-800">Forman ⬍</th>
+<th onclick="ordenarTabla('noForman')" class="p-2 border-b border-slate-700 text-center bg-rose-950 hover:bg-rose-900">No Forman ⬍</th>
+<th onclick="ordenarTabla('asistenciaPct')" class="p-2 border-b border-slate-700 text-center hover:bg-slate-800">% Asist ⬍</th>
+<th class="p-2 border-b border-slate-700 text-center">Acción</th>
+</tr>
+</thead>
+<tbody id="cuerpoTablaDinamica" class="divide-y divide-slate-200 dark:divide-slate-800 text-[11px] bg-white dark:bg-slate-900"></tbody>
+<tfoot id="pieTablaDinamica" class="bg-slate-100 dark:bg-slate-800 font-black text-[11px] border-t-2 border-slate-400 dark:border-slate-700"></tfoot>
+</table>
+</div>
+</section>
+
+<!-- ================= 5. HISTORIAL DE REPORTES ARCHIVADOS ================= -->
+<section id="view-historial" class="bg-white dark:bg-slate-900 rounded-b-lg shadow p-4 hidden border border-slate-200 dark:border-slate-800">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 gap-2">
+<div>
+<h2 class="font-black text-slate-900 dark:text-white text-xs sm:text-sm uppercase flex items-center gap-1.5">
+<i class="fa-solid fa-clock-rotate-left text-purple-600 dark:text-purple-400"></i> Historial de Reportes Archivados
+</h2>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">Los reportes se archivan automáticamente a las 00:00 hrs de cada día</p>
+</div>
+<div class="flex items-center gap-2">
+<select id="selectFechaHistorial" onchange="cargarReporteHistorial(this.value)" class="border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs bg-slate-50 dark:bg-slate-800 dark:text-white outline-none">
+<option value="">-- Seleccionar fecha histórica --</option>
+</select>
+</div>
+</div>
+
+<!-- Contenedor del reporte histórico -->
+<div id="contenedorReporteHistorico" class="space-y-4">
+<div class="text-center py-10 text-slate-400 bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
+<i class="fa-solid fa-folder-open text-2xl mb-1 text-slate-400"></i>
+<p class="font-bold text-xs">Seleccione una fecha arriba para inspeccionar el parte consolidado de esa jornada.</p>
+</div>
+</div>
+</section>
+
 </main>
 
-<div id="hostImg" style="position:fixed;left:-9999px;top:0;width:560px;background:#fff"></div>
-<div id="hostPrint"></div>
-
-<!-- MODAL -->
-<div id="modal" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center p-3 z-50">
+<!-- ================= MODAL DETALLE DE CÓMO ENVIÓ LA UNIDAD ================= -->
+<div id="modalDetalleServicio" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 z-50">
 <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-300 dark:border-slate-700">
 <div class="bg-slate-900 text-white p-3.5 rounded-t-2xl flex justify-between items-center">
-<div><h3 id="modalTitulo" class="font-black text-sm uppercase">Detalle</h3><p id="modalSub" class="text-[10px] text-slate-300"></p></div>
-<button onclick="cerrarModal()" class="text-slate-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+<div>
+<h3 id="modalTituloServicio" class="font-black text-sm uppercase">Detalle del Servicio</h3>
+<p id="modalSubtituloServicio" class="text-[10px] text-slate-300">Comprobante de recepción en la nube</p>
 </div>
-<div id="modalCuerpo" class="p-4 space-y-3 text-xs"></div>
+<button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-white text-lg font-bold px-2 py-0.5"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div id="modalCuerpoDetalle" class="p-4 space-y-3 text-xs"></div>
 <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-b-2xl border-t border-slate-200 dark:border-slate-700 text-right">
-<button onclick="cerrarModal()" class="bg-slate-800 dark:bg-slate-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Cerrar</button>
+<button onclick="cerrarModalDetalle()" class="bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Cerrar</button>
 </div>
 </div>
 </div>
 
 <script>
-/* ============ CONFIGURACIÓN ============ */
-const LOGO_SRC = "data:image/png;base64,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smzpUt556+3c82LxOPf9436OG3csgReilQXxsAtJGiYPPfwww4cOXTMHjloSs0qYhYVFCCFIZZwcshmPxdhi4OasrKlh2bJl+K7LD9//kCtr2bbNosVLWL58OVpr9tpn33YL96svPqO2ZiWmabLJJpuugZo+9/xzOJkMH0+axMeTJlFRWclxxx/PQUcfxjYDh5J2PWJW+4Vq21bYVhn4gGDs7/Zm79135elnnuXqa65jzpvPUT5oKPH+A0FXESQKaJUyJINkJZV+fTr2HxFS59pxf8GIw0ww2nx0EKCjBUIQrMN4xWqPf8ERhoZa5ZQkNmRzVas6YzJpTCeFcNK4C2az9KUnSP88nauvu46PP/ucY485Jux68zyUkMRsi7hlrrEwsuewZOlSJjzzLMlUKly4G/i1jEgq6JyzzuTb777nnvvv4+STT+bEk07iiGOOpVefPjiZDBecdz719fXIyEsFKsxRA9+nvr6uw/fOhrF+VNcduMVgtNa8+vprZLywnjp61A58+/U3LJy/gG22GYqUkt59+7QLc2bOmEomlaKispLK8pJ2nzFn/mJUoBix/fb0792rHe2ysaWV115/A4DDjzqS4088iaamJm656SZ22m47zj7nbKQU7frWsmW+QOkcou95HrZlcewxR/Plt99w3Y03kpkzjZWvP4X66UfM5gaMZAt+KrkxsJtf+RYb2R6ECJ1WhHms1QMrGdbncnxf0wyNeDV+cc6wAb1aPqzW2tS94WGH9v0cD1avOnmNWFVGUhERY61GYYV1bOV5OePVfhrp+ygnja6rpuGLD3Bqq9l/7FiuuOIKtt5qq7DzKvJabUNlHXkjEBiGDDnTUrJoyRJG7bADSxYt4skJEzjqyCNQnr/BaHQ2lB7Qvx8D+veDU1b9bcbs2ewyeidqVlbz3vvvcfihh+F5PpXlZfQfsClTvvue2T//zOBBg6muribtpEm1tLJ06TKqunZjz912zXnE4489hocf+gdTv/+e3//+99xw001UdepEc0srb7/3LnN+noPWmvKKinZ1lukzf0YpxY4770ynykqCCIzSwDdff4EQgs0GDMCyLVzXzRnws08/xaJ58+hcVcXtt95KVecq/nrZpUyY+DR/u/oa/nH33QzcbDPOPvNMVNRymWssadPsmSWhKKUoy09w0XnnceABY7nqqqt46snxxGb+QOX2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
-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
-<div><label class="lbl">Demostración nominal</label><textarea id="x_demo" rows="5" class="inp font-mono">${esc(p.demostracion)}</textarea></div>
-<div class="flex gap-2"><button onclick="guardarEdicion(${i})" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg">Guardar cambios</button><button onclick="vistaGestion()" class="px-4 bg-slate-600 text-white font-bold py-2 rounded-lg">Cancelar</button></div>`);
-}
-async function guardarEdicion(i) {
-  const h = historialCache[gestK], p = h.partes[i];
-  const g = id => { const v = parseInt($("x_" + id).value, 10); return isNaN(v) || v < 0 ? 0 : v; };
-  EF.forEach(([k]) => p[k] = g(k)); NOV.forEach(([k]) => p[k] = g(k));
-  p.efectivo = EF.reduce((s, [k]) => s + p[k], 0);
-  p.otrosCantidad = g("otros"); p.otrosDetalle = $("x_otrosDet").value.trim();
-  p.asisten = Math.max(0, p.efectivo - NOV.reduce((s, [k]) => s + p[k], 0) - p.otrosCantidad);
-  p.responsable = $("x_resp").value.trim(); p.demostracion = $("x_demo").value.trim();
-  try { await persistirHist(gestK, h, { unidad: p.unidad, parte: p }); alert("✅ Parte modificado."); }
-  catch (e) { alert("Error al guardar. Intente de nuevo."); }
-  await cargarHistorial(); vistaGestion();
+// ESCUDO OFICIAL COSSMIL BASE64 (OPTIMIZADO Y ULTRA LIVIANO)
+var LOGO_COSSMIL = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5/ooopgFFFFABRWn4f8P6n4i1BNP0e1NxcPnC7gqjAzks2AowOpIq14r8Iav4Ue3XVktttzv8t7edZkJTAYZXOCNy/nQBg0UUUAFFFFABRRSqCxAUZJ4AFACUVe1TSdR0iWKLVLC5spZoxLHHPGUZkyRnB5HIPB5qjQBs+Eteu/DWv22s2EYlnt94Cl2UHcpUglSDjDdjV7xf4r1LxN9mF/bx24td+1RI7sS+Mks7E4AUYA4HPtXMUUAFFFFABRRRQB0/gXwfqvi3VYrewjSO2WRBcXMxCxwgn1PBY44A5Ptk1qeLPA+r6PrV1Fp+mzXdj5x8h4JBOwUk4DY5DY4wRnOfeua0rU9T0m5F3pd9c2U4GPMglKEj0OOCPY8VpX3i/xTezrPda/qUkiDCkXLKF+gBAFAEP9ia9/0BdS/wDASP8AwrMrX/4SrxH/ANDBqn/gZJ/jWVQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAf/Z";
+
+// BASE DE DATOS FIREBASE DE GOOGLE (PROBADA Y OPERATIVA)
+var URL_FIREBASE = "https://partes-hmc-default-rtdb.firebaseio.com";
+
+var SERVICIOS_OFICIALES=[
+"Servicio de Imagenología","Servicio de Nutrición","Mantenimiento e Infraestructura",
+"Sección Almacenes","Sección Activos Fijos","Sección Lavandería","Servicio de Patología",
+"Vigencia de Derechos","Casa Adulto Mayor","Compañía de Seguridad H.M.C.",
+"Sección Adquisición y Contrataciones","Unidad Administrativa Financiera","Citas Médicas"
+];
+
+var partes=[];
+var ordenActualColumna = '';
+var ordenAscendente = true;
+
+function setTxt(id, val){ var el = document.getElementById(id); if(el) el.innerText = val; }
+function setHtml(id, val){ var el = document.getElementById(id); if(el) el.innerHTML = val; }
+
+function obtenerFechaMilitar(d){
+if(!d) d = new Date();
+var dia=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),m=String(d.getMinutes()).padStart(2,'0');
+var meses=["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+return `${dia}${h}${m}-${meses[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`;
 }
 
-/* ============ INICIO ============ */
-function init() {
-  construirUI();
-  let o = false; try { o = localStorage.getItem("hmc_modo_oscuro") === "1"; } catch (e) {}
-  aplicarTema(o);
-  switchTab("registro");
-  reloj(); setInterval(reloj, 1000);
-  recalcular();
-  cargarNube(); setInterval(cargarNube, 6000);
+function obtenerFechaISO(d){
+if(!d) d = new Date();
+var a = d.getFullYear();
+var m = String(d.getMonth() + 1).padStart(2, '0');
+var dia = String(d.getDate()).padStart(2, '0');
+return `${a}-${m}-${dia}`;
 }
-document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
+
+// Reloj inmediato sin demora
+function actualizarReloj(){
+var ahora = new Date();
+var str = `FH: ${obtenerFechaMilitar(ahora)} (${ahora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})})`;
+setTxt('relojVivo', str);
+}
+
+// INICIALIZACIÓN DE LOGOS
+function cargarLogos(){
+  var img1 = document.getElementById('imgLogoHeader');
+  var img2 = document.getElementById('imgLogoCard');
+  if(img1) img1.src = LOGO_COSSMIL;
+  if(img2) img2.src = LOGO_COSSMIL;
+}
+
+// GESTIÓN DE MODO OSCURO
+function toggleModoOscuro() {
+  document.documentElement.classList.toggle('dark');
+  var esOscuro = document.documentElement.classList.contains('dark');
+  localStorage.setItem('hmc_modo_oscuro', esOscuro ? '1' : '0');
+  actualizarIconoTema(esOscuro);
+}
+
+function actualizarIconoTema(esOscuro) {
+  var ico = document.getElementById('iconoModoOscuro');
+  var txt = document.getElementById('txtModoOscuro');
+  if (ico) ico.className = esOscuro ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-amber-300';
+  if (txt) txt.innerText = esOscuro ? 'Modo Claro' : 'Modo Oscuro';
+}
+
+function cargarPreferenciaModoOscuro() {
+  var guardado = localStorage.getItem('hmc_modo_oscuro');
+  var esOscuro = guardado === '1';
+  if (esOscuro) document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+  actualizarIconoTema(esOscuro);
+}
+
+// REINICIO AUTOMÁTICO A LAS 00:00 (ARCHIVA EL DÍA ANTERIOR)
+async function verificarAutoReinicio00(dataRaw){
+  var hoy = obtenerFechaISO();
+  var ultimaFecha = localStorage.getItem('hmc_fecha_activa');
+
+  if(!ultimaFecha){
+    localStorage.setItem('hmc_fecha_activa', hoy);
+    return;
+  }
+
+  if(ultimaFecha !== hoy && dataRaw && Object.keys(dataRaw).length > 0){
+    try{
+      // 1. Archivar el día anterior en Firebase /historial/FECHA
+      await fetch(`${URL_FIREBASE}/historial/${ultimaFecha}.json`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(dataRaw)
+      });
+      // 2. Limpiar el día activo para empezar en cero
+      await fetch(`${URL_FIREBASE}/partes_dia.json`, { method: 'DELETE' });
+      localStorage.setItem('hmc_fecha_activa', hoy);
+      partes = [];
+      renderizarCumplimiento();
+      renderizarCentralizado();
+      renderizarTablaDinamica();
+      recalcularTodo();
+      console.log(`Jornada ${ultimaFecha} archivada automáticamente.`);
+    }catch(e){
+      console.warn("Auto-archivo:", e);
+    }
+  } else if(ultimaFecha !== hoy){
+    localStorage.setItem('hmc_fecha_activa', hoy);
+  }
+}
+
+// CARGA DE DATOS EN TIEMPO REAL
+async function cargarPartesDeLaNube(){
+    try{
+        var res = await fetch(`${URL_FIREBASE}/partes_dia.json`);
+        if(res.ok){
+            var data = await res.json();
+            await verificarAutoReinicio00(data);
+            partes = data ? Object.values(data) : [];
+            var ahora = new Date();
+            setTxt('txtUltimaSync', `Sinc: ${ahora.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+            setTxt('txtEstadoNube', `Firebase: En Línea (${partes.length})`);
+            var dot = document.getElementById('dotEstado');
+            if(dot) dot.className = "inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            renderizarCumplimiento();
+            renderizarCentralizado();
+            renderizarTablaDinamica();
+            actualizarSelectUnidades();
+        }
+    }catch(err){
+        setTxt('txtEstadoNube', "Reintentando...");
+        var dot = document.getElementById('dotEstado');
+        if(dot) dot.className = "inline-block w-2 h-2 rounded-full bg-amber-400";
+    }
+}
+setInterval(cargarPartesDeLaNube, 6000);
+
+function switchTab(t){
+['registro','cumplimiento','centralizado','tablaResumen','historial'].forEach(v=>{
+var sec = document.getElementById(`view-${v}`);
+if(sec) sec.classList.toggle('hidden', v!==t);
+var b=document.getElementById(`tab-${v}`);
+if(b) b.className=v===t?'px-4 py-2.5 active-tab whitespace-nowrap':'px-4 py-2.5 text-slate-600 dark:text-slate-400 whitespace-nowrap';
+});
+if(t==='cumplimiento') renderizarCumplimiento();
+if(t==='centralizado') renderizarCentralizado();
+if(t==='tablaResumen') renderizarTablaDinamica();
+if(t==='historial') cargarFechasHistorial();
+}
+
+function verificarOtro(v){
+var m=document.getElementById('unidadManual');
+if(!m) return;
+if(v==='__OTRO__'){m.classList.remove('hidden');m.required=true;m.focus()}
+else{m.classList.add('hidden');m.required=false}
+}
+
+function n(id){var e=document.getElementById(id);if(!e)return 0;var v=parseInt(e.value,10);return isNaN(v)?0:v}
+
+function recalcularTodo(){
+var ef=n('mil')+n('itm')+n('p121')+n('p251')+n('p252')+n('trp');
+var aus=n('novBaja')+n('novVacacion')+n('novCtaVacacion')+n('novGuardia')+n('novCumple')+n('novComision')+n('novPermiso')+n('novSaliente')+n('novHosp')+n('novFalta')+n('novCambio')+n('novOtros');
+var forman=Math.max(0,ef-aus);
+
+setTxt('txtEfectivoTotal', ef);
+setTxt('txtTotalAusentes', aus);
+setTxt('resumenFormulaEf', ef);
+setTxt('resumenFormulaNov', aus);
+setTxt('resumenFormulaForman', forman);
+var asis=document.getElementById('novAsiste');
+if(asis) asis.value=forman;
+}
+
+function initApp(){
+    cargarLogos();
+    cargarPreferenciaModoOscuro();
+    actualizarReloj();
+    document.querySelectorAll('.calc-efectivo,.calc-novedad').forEach(i=>{
+        i.addEventListener('input',recalcularTodo);
+        i.addEventListener('change',recalcularTodo);
+    });
+    recalcularTodo();
+    cargarPartesDeLaNube();
+}
+if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+actualizarReloj();
+setInterval(actualizarReloj, 1000);
+
+async function guardarParte(e){
+e.preventDefault();
+
+var sel=document.getElementById('unidadSelect').value;
+var u=sel==='__OTRO__'?document.getElementById('unidadManual').value.trim():sel;
+if(!u){alert('Seleccione o escriba su servicio.');return}
+
+var totalEf=n('mil')+n('itm')+n('p121')+n('p251')+n('p252')+n('trp');
+var ahora=new Date();
+var h=ahora.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+var nuevo={
+id:Date.now(),fechaMilitar:obtenerFechaMilitar(ahora),horaEnvio:h,unidad:u,responsable:document.getElementById('responsable').value.trim(),
+mil:n('mil'),itm:n('itm'),p121:n('p121'),p251:n('p251'),p252:n('p252'),trp:n('trp'),efectivo:totalEf,asisten:n('novAsiste'),
+baja:n('novBaja'),vacacion:n('novVacacion'),ctaVacacion:n('novCtaVacacion'),guardiaHmc:n('novGuardia'),cumpleanos:n('novCumple'),
+comision:n('novComision'),permiso:n('novPermiso'),saliente:n('novSaliente'),hospitalizado:n('novHosp'),falta:n('novFalta'),cambioDestino:n('novCambio'),
+otrosCantidad:n('novOtros'),otrosDetalle:document.getElementById('novOtrosDetalle').value.trim(),
+demostracion:document.getElementById('demostracion').value.trim()
+};
+
+var btn=document.getElementById('btnEnviar');
+btn.innerText="Enviando a Google Firebase...";
+btn.disabled=true;
+
+try{
+    var clave = encodeURIComponent(u.toLowerCase().replace(/[.#$\[\]]/g, '_'));
+    await fetch(`${URL_FIREBASE}/partes_dia/${clave}.json`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(nuevo)
+    });
+
+    alert(`✅ ¡Parte de ${u} guardado y sincronizado con éxito!`);
+    document.getElementById('parteForm').reset();
+    document.getElementById('unidadManual').classList.add('hidden');
+    recalcularTodo();
+    await cargarPartesDeLaNube();
+    switchTab('centralizado');
+}catch(err){
+    alert("Error de conexión. Intente nuevamente.");
+}finally{
+    btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Parte Oficial a la Nube';
+    btn.disabled=false;
+}
+}
+
+function renderizarCumplimiento(){
+var c=document.getElementById('listaCumplieron'),f=document.getElementById('listaFaltan');
+if(!c || !f) return;
+c.innerHTML='';f.innerHTML='';
+var env=partes.map(p=>p.unidad.toLowerCase());
+var ok=0,pend=0;
+
+partes.forEach(p=>{
+ok++;
+var d=document.createElement('div');
+d.className='bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50 shadow-sm flex justify-between items-center';
+d.innerHTML=`<div><div class="font-bold text-slate-800 dark:text-slate-100">${p.unidad}</div><div class="text-[10px] text-slate-500 dark:text-slate-400">${p.responsable}</div></div><span class="bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-bold px-2 py-0.5 rounded text-[10px]"><i class="fa-regular fa-clock"></i> ${p.horaEnvio}</span>`;
+c.appendChild(d);
+});
+
+SERVICIOS_OFICIALES.forEach(s=>{
+if(!env.includes(s.toLowerCase())){
+pend++;
+var d=document.createElement('div');
+d.className='bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-rose-200 dark:border-rose-800/50 shadow-sm flex justify-between items-center';
+d.innerHTML=`<span class="text-rose-900 dark:text-rose-300 font-semibold">${s}</span><span class="bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-700 font-bold px-1.5 py-0.5 rounded text-[10px]">PENDIENTE</span>`;
+f.appendChild(d);
+}
+});
+setTxt('countCumplieron', ok);
+setTxt('countFaltan', pend);
+setTxt('tabCountCumplidos', `${ok}/${ok+pend}`);
+}
+
+function copiarReporteCumplimiento(){
+var ahora=new Date();
+var env=partes.map(p=>p.unidad.toLowerCase());
+var omisos=SERVICIOS_OFICIALES.filter(s=>!env.includes(s.toLowerCase()));
+
+var msg=`*CONTROL DE CUMPLIMIENTO DE PARTES - HMC*\n*FH.:* ${obtenerFechaMilitar(ahora)}\n\n`;
+msg+=`✅ *ENVIARON (${partes.length}):*\n`;
+partes.forEach((p,i)=>msg+=`${i+1}. *${p.unidad}* (${p.horaEnvio}) - ${p.responsable}\n`);
+msg+=`\n⚠️ *OMISOS / PENDIENTES (${omisos.length}):*\n`;
+omisos.forEach((s,i)=>msg+=`${i+1}. *${s}* 🔴 (PENDIENTE)\n`);
+
+navigator.clipboard.writeText(msg).then(()=>alert('📋 Reporte de cumplimiento copiado para WhatsApp.'));
+}
+
+// RENDERIZADO DEL PARTE GENERAL CON NOVEDADES CLASIFICADAS POR ÁREA
+function renderizarCentralizado(){
+var fhActual = obtenerFechaMilitar();
+var horaActual = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+setTxt('cardReporteFH', `Enviado a las: ${horaActual} | FH: ${fhActual}`);
+
+var tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
+var nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
+var bloquesDemostracionPorArea = [];
+
+partes.forEach(p => {
+tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
+nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
+nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
+nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
+
+var noFormanUnidad = (p.efectivo||0) - (p.asisten||0);
+var tieneTexto = p.demostracion && p.demostracion.trim().length > 0;
+var tieneOtros = p.otrosCantidad > 0 && p.otrosDetalle;
+
+if(noFormanUnidad > 0 || tieneTexto || tieneOtros){
+    var tituloArea = `■ ${p.unidad.toUpperCase()} (Novedades: ${noFormanUnidad}):`;
+    var cuerpoArea = [];
+    if(tieneTexto) cuerpoArea.push(p.demostracion.trim());
+    if(tieneOtros) cuerpoArea.push(`• OTROS: ${p.otrosDetalle} (${p.otrosCantidad})`);
+    if(!tieneTexto && !tieneOtros) cuerpoArea.push(`• Personal ausente: ${noFormanUnidad} (Sin nombres detallados)`);
+    bloquesDemostracionPorArea.push(`${tituloArea}\n${cuerpoArea.join('\n')}`);
+}
+});
+
+var totalNoForman = tEf - tAsis;
+
+setTxt('cardMil', tMil);
+setTxt('cardItm', tItm);
+setTxt('cardP121', tP121);
+setTxt('cardP251', tP251);
+setTxt('cardP252', tP252);
+setTxt('cardTrp', tTrp);
+
+setTxt('cardTotalEf', tEf);
+setTxt('cardTotalForman', tAsis);
+setTxt('cardTotalNoForman', totalNoForman);
+
+setHtml('cardListaNovedades', `
+<div class="flex justify-between"><span>Baja:</span><b>${nov.baja}</b></div>
+<div class="flex justify-between"><span>Vacación:</span><b>${nov.vac}</b></div>
+<div class="flex justify-between"><span>P/Cta:</span><b>${nov.cta}</b></div>
+<div class="flex justify-between"><span>Guardia HMC:</span><b>${nov.guardia}</b></div>
+<div class="flex justify-between"><span>Cumpleaños:</span><b>${nov.cumple}</b></div>
+<div class="flex justify-between"><span>Comisión:</span><b>${nov.com}</b></div>
+<div class="flex justify-between"><span>Saliente:</span><b>${nov.sal}</b></div>
+<div class="flex justify-between"><span>Hospitalizado:</span><b>${nov.hosp}</b></div>
+<div class="flex justify-between"><span>Falta:</span><b>${nov.fal}</b></div>
+<div class="flex justify-between"><span>Otros:</span><b>${nov.otros}</b></div>
+`);
+
+var term = document.getElementById('cardDemostracionTerminal');
+if(term){
+    if(bloquesDemostracionPorArea.length > 0){
+        term.innerText = bloquesDemostracionPorArea.join('\n\n');
+    } else {
+        term.innerText = "SIN NOVEDADES REGISTRADAS (PERSONAL COMPLETO EN FORMACIÓN)";
+    }
+}
+}
+
+// RENDERIZADO TABLA DINÁMICA
+function renderizarTablaDinamica(){
+var tbody = document.getElementById('cuerpoTablaDinamica');
+var tfoot = document.getElementById('pieTablaDinamica');
+if(!tbody || !tfoot) return;
+tbody.innerHTML = '';
+
+var lista = [...partes];
+
+if(ordenActualColumna){
+lista.sort((a,b)=>{
+var vA = a[ordenActualColumna];
+var vB = b[ordenActualColumna];
+if(ordenActualColumna === 'noForman'){
+vA = (a.efectivo||0) - (a.asisten||0);
+vB = (b.efectivo||0) - (b.asisten||0);
+}
+if(ordenActualColumna === 'asistenciaPct'){
+vA = a.efectivo > 0 ? (a.asisten / a.efectivo) : 0;
+vB = b.efectivo > 0 ? (b.asisten / b.efectivo) : 0;
+}
+if(typeof vA === 'string'){
+return ordenAscendente ? vA.localeCompare(vB) : vB.localeCompare(vA);
+}
+return ordenAscendente ? (vA - vB) : (vB - vA);
+});
+}
+
+var totEf=0,totMil=0,totItm=0,totP121=0,totP251=0,totP252=0,totTrp=0,totAsis=0,totNoF=0;
+
+if(lista.length === 0){
+tbody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-slate-400">No hay partes registrados para mostrar en la matriz.</td></tr>`;
+}
+
+lista.forEach(p => {
+var noF = (p.efectivo||0) - (p.asisten||0);
+var pct = p.efectivo > 0 ? Math.round((p.asisten / p.efectivo) * 100) : 0;
+
+totEf += p.efectivo; totMil += p.mil; totItm += p.itm; totP121 += p.p121;
+totP251 += p.p251; totP252 += p.p252; totTrp += p.trp; totAsis += p.asisten; totNoF += noF;
+
+var tr = document.createElement('tr');
+tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800 transition border-b border-slate-200 dark:border-slate-800';
+tr.innerHTML = `
+<td class="p-2 font-bold text-slate-800 dark:text-slate-100">
+<div>${p.unidad}</div>
+<div class="text-[9px] text-slate-400 font-normal"><i class="fa-regular fa-clock"></i> ${p.horaEnvio} | ${p.responsable}</div>
+</td>
+<td class="p-2 text-center font-bold text-blue-900 dark:text-blue-400">${p.efectivo}</td>
+<td class="p-2 text-center text-slate-600 dark:text-slate-300">${p.mil}</td>
+<td class="p-2 text-center text-slate-600 dark:text-slate-300">${p.itm}</td>
+<td class="p-2 text-center text-blue-800 dark:text-blue-300">${p.p121||0}</td>
+<td class="p-2 text-center text-blue-800 dark:text-blue-300">${p.p251||0}</td>
+<td class="p-2 text-center text-blue-800 dark:text-blue-300">${p.p252||0}</td>
+<td class="p-2 text-center text-slate-600 dark:text-slate-300">${p.trp}</td>
+<td class="p-2 text-center font-bold text-emerald-700 bg-emerald-50/50">${p.asisten}</td>
+<td class="p-2 text-center font-bold ${noF>0?'text-rose-700 bg-rose-50/50':'text-slate-400'}">${noF}</td>
+<td class="p-2 text-center">
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${pct>=90?'bg-emerald-100 text-emerald-800':(pct>=75?'bg-amber-100 text-amber-800':'bg-rose-100 text-rose-800')}">${pct}%</span>
+</td>
+<td class="p-2 text-center">
+<button onclick="verDetalleEnvio('${encodeURIComponent(p.unidad)}')" class="bg-blue-800 hover:bg-blue-900 text-white px-2 py-1 rounded text-[10px] font-bold shadow-xs transition">
+<i class="fa-solid fa-receipt"></i> Detalle
+</button>
+</td>
+`;
+tbody.appendChild(tr);
+});
+
+var totPct = totEf > 0 ? Math.round((totAsis / totEf) * 100) : 0;
+tfoot.innerHTML = `
+<tr>
+<td class="p-2 uppercase text-slate-800 dark:text-slate-200">TOTAL GENERAL:</td>
+<td class="p-2 text-center text-blue-900 dark:text-blue-400">${totEf}</td>
+<td class="p-2 text-center">${totMil}</td>
+<td class="p-2 text-center">${totItm}</td>
+<td class="p-2 text-center">${totP121}</td>
+<td class="p-2 text-center">${totP251}</td>
+<td class="p-2 text-center">${totP252}</td>
+<td class="p-2 text-center">${totTrp}</td>
+<td class="p-2 text-center text-emerald-800">${totAsis}</td>
+<td class="p-2 text-center text-rose-800">${totNoF}</td>
+<td class="p-2 text-center text-blue-900">${totPct}%</td>
+<td class="p-2 text-center text-slate-500 font-normal">--</td>
+</tr>
+`;
+}
+
+function ordenarTabla(col){
+if(ordenActualColumna === col){
+ordenAscendente = !ordenAscendente;
+} else {
+ordenActualColumna = col;
+ordenAscendente = true;
+}
+renderizarTablaDinamica();
+}
+
+function actualizarSelectUnidades(){
+var sel = document.getElementById('filtroRapidoUnidad');
+if(!sel) return;
+var valActual = sel.value;
+sel.innerHTML = `<option value="">-- Ver todas las unidades (${partes.length}) --</option>`;
+partes.forEach(p => {
+sel.innerHTML += `<option value="${p.unidad}">${p.unidad}</option>`;
+});
+sel.value = valActual;
+}
+
+function filtrarTablaPorSelect(unidad){
+if(!unidad){
+renderizarTablaDinamica();
+return;
+}
+verDetalleEnvio(encodeURIComponent(unidad));
+}
+
+function verDetalleEnvio(unidadEncoded){
+var unidad = decodeURIComponent(unidadEncoded);
+var p = partes.find(x => x.unidad.toLowerCase() === unidad.toLowerCase());
+if(!p) return;
+
+setTxt('modalTituloServicio', p.unidad);
+setTxt('modalSubtituloServicio', `Enviado a las: ${p.horaEnvio} | FH: ${p.fechaMilitar || 'Registrado'}`);
+
+var noF = (p.efectivo||0) - (p.asisten||0);
+var cuerpo = document.getElementById('modalCuerpoDetalle');
+if(cuerpo){
+cuerpo.innerHTML = `
+<div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-lg">
+<div class="text-[10px] font-bold text-slate-500 uppercase">RESPONSABLE OFICIAL:</div>
+<div class="text-xs font-black text-slate-900 dark:text-white">${p.responsable}</div>
+</div>
+
+<div class="border rounded-lg p-2.5 bg-blue-50/50 dark:bg-blue-950/20">
+<div class="text-[10px] font-bold uppercase text-blue-900 dark:text-blue-300 mb-1">EFECTIVO DESGLOSADO:</div>
+<div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[10px] font-bold">
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700">Mil: <b>${p.mil}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700">Ítem: <b>${p.itm}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 text-blue-800 dark:text-blue-300">P-121: <b>${p.p121||0}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 text-blue-800 dark:text-blue-300">P-251: <b>${p.p251||0}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 text-blue-800 dark:text-blue-300">P-252: <b>${p.p252||0}</b></div>
+<div class="bg-white dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700">Trp: <b>${p.trp}</b></div>
+</div>
+<div class="mt-2 pt-1 border-t flex justify-between font-bold text-xs">
+<span>Total Efectivo: <b class="text-blue-900 dark:text-blue-300">${p.efectivo}</b></span>
+<span class="text-emerald-700 dark:text-emerald-400">Forman: <b>${p.asisten}</b></span>
+<span class="${noF>0?'text-rose-700 dark:text-rose-400':'text-slate-500'}">No Forman: <b>${noF}</b></span>
+</div>
+</div>
+
+<div class="border rounded-lg p-2.5 bg-amber-50/40 dark:bg-amber-950/20">
+<div class="text-[10px] font-bold uppercase text-amber-900 dark:text-amber-300 mb-1">NOVEDADES NUMÉRICAS:</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
+<div>Baja: <b>${p.baja||0}</b></div>
+<div>Vacación: <b>${p.vacacion||0}</b></div>
+<div>P/Cta: <b>${p.ctaVacacion||0}</b></div>
+<div>Guardia: <b>${p.guardiaHmc||0}</b></div>
+<div>Cumpleaños: <b>${p.cumpleanos||0}</b></div>
+<div>Comisión: <b>${p.comision||0}</b></div>
+<div>Saliente: <b>${p.saliente||0}</b></div>
+<div>Hospitalizado: <b>${p.hospitalizado||0}</b></div>
+</div>
+${p.otrosCantidad > 0 ? `<div class="mt-1 pt-1 border-t text-[10px] text-amber-900 font-semibold">Otros (${p.otrosCantidad}): ${p.otrosDetalle || 'Sin detalle'}</div>` : ''}
+</div>
+
+<div>
+<div class="text-[10px] font-bold uppercase text-slate-700 dark:text-slate-300 mb-1">DEMOSTRACIÓN NOMINAL ENVIADA:</div>
+<div class="bg-slate-900 text-slate-100 p-2.5 rounded-lg font-mono text-[10px] whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
+${p.demostracion ? p.demostracion : 'Sin demostración nominal.'}
+</div>
+</div>
+`;
+}
+
+var modal = document.getElementById('modalDetalleServicio');
+if(modal) modal.classList.remove('hidden');
+}
+
+function cerrarModalDetalle(){
+var modal = document.getElementById('modalDetalleServicio');
+if(modal) modal.classList.add('hidden');
+}
+
+// CARGA DE HISTORIAL
+async function cargarFechasHistorial(){
+  var sel = document.getElementById('selectFechaHistorial');
+  if(!sel) return;
+  try{
+    var res = await fetch(`${URL_FIREBASE}/historial.json?shallow=true`);
+    var fechas = await res.json();
+    sel.innerHTML = '<option value="">-- Seleccionar fecha histórica --</option>';
+    if(fechas){
+      Object.keys(fechas).sort().reverse().forEach(f => {
+        sel.innerHTML += `<option value="${f}">Jornada del ${f}</option>`;
+      });
+    } else {
+      sel.innerHTML += '<option value="">No hay reportes archivados todavía</option>';
+    }
+  }catch(e){
+    console.warn("Error cargando historial:", e);
+  }
+}
+
+async function cargarReporteHistorial(fecha){
+  var cont = document.getElementById('contenedorReporteHistorico');
+  if(!fecha){
+    cont.innerHTML = `<div class="text-center py-10 text-slate-400 bg-slate-50 dark:bg-slate-800/40 border border-dashed rounded-xl"><p class="font-bold text-xs">Seleccione una fecha arriba.</p></div>`;
+    return;
+  }
+  cont.innerHTML = '<div class="text-center py-8 text-xs font-bold text-blue-700">Cargando reporte histórico archivado...</div>';
+  try{
+    var res = await fetch(`${URL_FIREBASE}/historial/${fecha}.json`);
+    var data = await res.json();
+    var partesHist = data ? Object.values(data) : [];
+    
+    let tEf=0, tAsis=0;
+    partesHist.forEach(p => { tEf += p.efectivo; tAsis += p.asisten; });
+    let noF = tEf - tAsis;
+
+    cont.innerHTML = `
+      <div class="max-w-xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-700 p-4 space-y-3 text-xs">
+        <div class="border-b pb-2 flex justify-between items-center">
+          <div>
+            <h3 class="font-black text-slate-900 dark:text-white uppercase text-sm">PARTE HISTÓRICO H.M.C.</h3>
+            <p class="text-[10px] text-purple-600 dark:text-purple-400 font-bold font-mono">ARCHIVADO EL: ${fecha}</p>
+          </div>
+          <span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Historial</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center font-bold">
+          <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border">Efectivo: <b>${tEf}</b></div>
+          <div class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 p-2 rounded-lg border">Forman: <b>${tAsis}</b></div>
+          <div class="bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 p-2 rounded-lg border">No Forman: <b>${noF}</b></div>
+        </div>
+        <div class="border-t pt-2">
+          <div class="text-[10px] font-bold uppercase text-slate-500 mb-1">Unidades que enviaron (${partesHist.length}):</div>
+          <div class="space-y-1 max-h-48 overflow-y-auto font-mono text-[10px]">
+            ${partesHist.map((p,i) => `<div class="bg-slate-50 dark:bg-slate-800 p-1.5 rounded border">${i+1}. <b>${p.unidad}</b> (Ef: ${p.efectivo} | Forman: ${p.asisten})</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }catch(e){
+    cont.innerHTML = '<div class="text-center py-6 text-rose-600 font-bold text-xs">Error al cargar la fecha histórica.</div>';
+  }
+}
+
+// GENERADOR DE IMAGEN HD
+function cargarLibreriaImagen(callback){
+    if(window.html2canvas){ callback(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = callback;
+    s.onerror = () => alert("Error cargando librería gráfica.");
+    document.head.appendChild(s);
+}
+
+function generarImagenWhatsAppCard(){
+if(partes.length===0) return alert('No hay partes registrados para generar la imagen.');
+
+var btn = event ? (event.currentTarget || event.target) : null;
+var textoOriginal = btn ? btn.innerHTML : '';
+if(btn){
+    btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generando Imagen HD...';
+    btn.disabled = true;
+}
+
+cargarLibreriaImagen(async () => {
+    try{
+        var tarjeta = document.getElementById('tarjetaReporteWhatsApp');
+        var canvas = await html2canvas(tarjeta, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+
+        canvas.toBlob(async (blob) => {
+            var nombreArchivo = `PARTE_GENERAL_HMC_${obtenerFechaMilitar()}.png`;
+            var file = new File([blob], nombreArchivo, { type: 'image/png' });
+
+            if(navigator.canShare && navigator.canShare({ files: [file] })){
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'PARTE GENERAL H.M.C.',
+                        text: `PARTE GENERAL H.M.C. - U.A.P.`
+                    });
+                    return;
+                } catch (err) {}
+            }
+
+            var enlace = document.createElement('a');
+            enlace.download = nombreArchivo;
+            enlace.href = canvas.toDataURL('image/png');
+            enlace.click();
+            alert('📸 ¡Imagen oficial de PARTE GENERAL H.M.C. descargada con éxito!');
+        }, 'image/png');
+
+    } catch(err){
+        alert('Error al generar imagen.');
+    } finally{
+        if(btn){
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
+        }
+    }
+});
+}
+
+function copiarResumenWhatsApp(){
+if(partes.length===0) return alert('No hay partes registrados en la nube hoy.');
+
+var tEf=0,tMil=0,tItm=0,tP121=0,tP251=0,tP252=0,tTrp=0,tAsis=0;
+var nov={baja:0,vac:0,cta:0,guardia:0,cumple:0,com:0,sal:0,hosp:0,fal:0,otros:0};
+var bloquesWhatsAppAreas = [];
+
+partes.forEach(p=>{
+tEf+=p.efectivo;tMil+=p.mil;tItm+=p.itm;tP121+=p.p121;tP251+=p.p251;tP252+=p.p252;tTrp+=p.trp;tAsis+=p.asisten;
+nov.baja+=(p.baja||0);nov.vac+=(p.vacacion||0);nov.cta+=(p.ctaVacacion||0);nov.guardia+=(p.guardiaHmc||0);
+nov.cumple+=(p.cumpleanos||0);nov.com+=(p.comision||0);nov.sal+=(p.saliente||0);nov.hosp+=(p.hospitalizado||0);
+nov.fal+=(p.falta||0);nov.otros+=(p.otrosCantidad||0);
+
+var noF = (p.efectivo||0) - (p.asisten||0);
+var tieneTxt = p.demostracion && p.demostracion.trim().length > 0;
+var tieneOtr = p.otrosCantidad > 0 && p.otrosDetalle;
+
+if(noF > 0 || tieneTxt || tieneOtr){
+    var txtUnidad = `■ *${p.unidad.toUpperCase()}* (Nov: ${noF})\n`;
+    if(tieneTxt) txtUnidad += `${p.demostracion.trim()}\n`;
+    if(tieneOtr) txtUnidad += `• Otros: ${p.otrosDetalle} (${p.otrosCantidad})\n`;
+    bloquesWhatsAppAreas.push(txtUnidad.trim());
+}
+});
+
+var noForman = tEf - tAsis;
+
+var msg = `*PARTE GENERAL H.M.C.*\n`;
+msg += `*MINISTERIO DE DEFENSA*\n`;
+msg += `*FH.:* ${obtenerFechaMilitar()}\n\n`;
+
+msg += `*1. EFECTIVO GENERAL:* ${tEf}\n`;
+msg += `• Mil: ${tMil} | Ítem: ${tItm} | P-121: ${tP121}\n`;
+msg += `• P-251: ${tP251} | P-252: ${tP252} | Tropa: ${tTrp}\n`;
+msg += `🟢 *FORMAN / ASISTEN:* ${tAsis}\n`;
+msg += `🔴 *NO FORMAN:* ${noForman}\n\n`;
+
+msg += `*2. NOVEDADES REGISTRADAS*\n`;
+msg += `• Baja: ${nov.baja} | Vacación: ${nov.vac}\n• P/Cta: ${nov.cta} | Guardia: ${nov.guardia}\n• Comisión: ${nov.com} | Otros: ${nov.otros}\n\n`;
+
+msg += `*3. DEMOSTRACIÓN NOMINAL POR ÁREAS:*\n`;
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+if(bloquesWhatsAppAreas.length > 0){
+    msg += bloquesWhatsAppAreas.join('\n\n') + '\n';
+} else {
+    msg += `_Sin novedades de personal registradas en ninguna unidad._\n`;
+}
+msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+msg += `*ATTE.*\n*JEFE DE UNIDAD DE ADMINISTRACIÓN DE PERSONAL*\nHospital Militar Central "COSSMIL"`;
+
+navigator.clipboard.writeText(msg).then(()=>alert('📋 ¡Texto copiado al portapapeles con novedades clasificadas por área!'));
+}
 </script>
 </body>
 </html>
